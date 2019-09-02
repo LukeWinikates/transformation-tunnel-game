@@ -1,0 +1,30 @@
+:root {
+  --yellow: #e2ac22;
+  --sea-blue: #0e6297;
+  --red: #a40016;
+  --orange: #e96214;
+  --dark-neutral: #4e493c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+
+body {
+  margin: 0;
+  min-height: 100vh;
+
+  background: repeating-linear-gradient(
+    var(--yellow),
+    var(--yellow) 40px,
+    var(--dark-neutral) 40px,
+    var(--dark-neutral) 42px,
+    var(--sea-blue) 42px,
+    var(--sea-blue) 80px,
+    var(--dark-neutral) 80px,
+    var(--dark-neutral) 82px,
+    var(--orange) 82px,
+    var(--orange) 120px
+  );
+}
