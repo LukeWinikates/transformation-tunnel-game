@@ -1,5 +1,5 @@
 [X] make stripey background for desktop
-[ ] make game container mobile sized
+[X] make game container mobile sized
 [ ] show a list of clickable buttons on load
 [ ] on click, scroll up and show text
 [ ] show emoji character "walking" up into the space

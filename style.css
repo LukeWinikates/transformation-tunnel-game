@@ -4,17 +4,17 @@
   --red: #a40016;
   --orange: #e96214;
   --dark-neutral: #4e493c;
+  --light-neutral: #eeeeed;
 }
 
 * {
   box-sizing: border-box;
+  font-family: "Lucida Grande","Trebuchet MS", sans-serif;
 }
 
 
 body {
   margin: 0;
-  min-height: 100vh;
-
   background: repeating-linear-gradient(
     var(--yellow),
     var(--yellow) 40px,
@@ -27,4 +27,18 @@ body {
     var(--orange) 82px,
     var(--orange) 120px
   );
+}
+
+.container {
+  width: calc(100vw - 40px);
+  max-width: 480px;
+  height: calc(100vh - 40px);
+
+  padding: 5px;
+  margin: 20px auto;
+
+  background-color: var(--light-neutral);
+
+  border-radius: 3px;
+  border: 1px solid var(--dark-neutral);
 }
