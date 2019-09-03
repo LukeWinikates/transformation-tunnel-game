@@ -25,7 +25,9 @@ body {
     var(--dark-neutral) 80px,
     var(--dark-neutral) 82px,
     var(--orange) 82px,
-    var(--orange) 120px
+    var(--orange) 120px,
+    var(--dark-neutral) 120px,
+    var(--dark-neutral) 122px
   );
 }
 
