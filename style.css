@@ -29,7 +29,24 @@ body {
   );
 }
 
+button {
+  padding: 5px;
+  border-radius: 3px;
+  border: 1px solid var(--sea-blue);
+  font-size: 20px;
+  width: calc(50% - 10px);
+  margin: 5px;
+  transition: background-color .3s ease-in;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: var(--sea-blue);
+}
+
 .container {
+  text-align: center;
+
   width: calc(100vw - 40px);
   max-width: 480px;
   height: calc(100vh - 40px);
@@ -41,4 +58,15 @@ body {
 
   border-radius: 3px;
   border: 1px solid var(--dark-neutral);
+
+  display: flex;
+  flex-direction: column;
+}
+
+.stage {
+  height: 40%;
+  padding: 20px;
+}
+
+.buttons {
 }
