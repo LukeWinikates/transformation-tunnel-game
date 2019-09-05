@@ -9,7 +9,7 @@
 
 * {
   box-sizing: border-box;
-  font-family: "Lucida Grande","Trebuchet MS", sans-serif;
+  font-family: "Lucida Grande", "Trebuchet MS", sans-serif;
 }
 
 
@@ -53,7 +53,6 @@ button:hover {
   max-width: 480px;
   height: calc(100vh - 40px);
 
-  padding: 5px;
   margin: 20px auto;
 
   background-color: var(--light-neutral);
@@ -65,10 +64,65 @@ button:hover {
   flex-direction: column;
 }
 
-.stage {
-  height: 40%;
-  padding: 20px;
+#narration {
+  border-bottom: 1px solid var(--dark-neutral);
+  height: 0;
+  padding-top: -100%;
+  overflow: hidden;
+  transition: all 1s ease-in;
 }
 
-.buttons {
+#narration.expanded {
+  height: 20%;
+  padding-top: 0;
+}
+
+#stage {
+  overflow: hidden;
+  height: 40%;
+  padding: 20px;
+  transition: all 1s ease-in;
+}
+
+#stage.expanded {
+  height: 60%;
+}
+
+#buttons {
+  height: 60%;
+  padding: 5px;
+  transition: all 1s ease-in;
+  overflow: hidden;
+}
+
+#buttons.collapsed {
+  height: 10%;
+}
+
+.portal {
+  width: 1200px;
+  height: 80px;
+  transition: all 8s ease-in;
+  margin-left: 200px;
+  display: flex;
+  flex-direction: row;
+}
+
+.portal-entrance, .portal-exit, .portal-body {
+  height: 100%;
+  background-color: var(--sea-blue);
+}
+
+.portal-entrance, .portal-exit {
+  width: 30px;
+  border-radius: 50%;
+  border: 2px solid var(--dark-neutral);
+}
+
+.portal-body {
+  width: 1000px;
+}
+
+.move-left {
+  margin-left: -1000px;
 }

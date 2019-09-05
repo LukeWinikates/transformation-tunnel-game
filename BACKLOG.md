@@ -7,5 +7,7 @@
 [ ] do favicon, etc
 [ ] get running on Glitch
 [ ] consider analytics options
+[ ] track number of times played
+[ ] best-effort anonymous identity hash - ip address? session nonce?
 [ ] link to feedback form
 [ ] link to glitch page for feedback
