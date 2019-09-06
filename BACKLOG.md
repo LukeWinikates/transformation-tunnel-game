@@ -2,7 +2,11 @@
 [X] make game container mobile sized
 [X] show a list of clickable buttons on load
 [X] on click show text
-[ ] on click animate the scrolling of the text
+[ ] animated text scrolling/transitions -- timed fadeouts, hanging over the content
+[ ] figure out how th e
+[ ] show the character stepping out into the world
+[ ] show the character emerging from the tunnel
+[ ] animate the color/appearance of the tunnel as it's in motion
 [ ] make audio recordings, play them
 [ ] do favicon, etc
 [ ] get running on Glitch

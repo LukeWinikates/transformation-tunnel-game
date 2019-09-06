@@ -2,7 +2,7 @@
 
 
 const scenes = [
-  'start', // intro splash blurb
+  'characterSelect', // intro splash blurb
     // possibly have the little emoji characters milling around
     // tap to focus and then can drag?
   'approach', // item moving onto the stage
@@ -17,19 +17,25 @@ const scenes = [
     // they pull the character 'up' into the tunnel and as they move them through it the sound effect happens, then they drop into the new space
     // a portal of pure sound - some kind of waveform visualization happens, maybe incorporating the emoji, and they get pulled through it
   'reveal', // they've emerged back into the other side
-    // there's an action to return back to the start by clicking, and this character drops into the starting collection
+    // there's an action to return back to the characterSelect by clicking, and this character drops into the starting collection
 ]
 
 const init = (rootNode) => {
+
+
   const items = [
     {
       id: 'elixir',
       introText: 'a wizard was trying to decipher a recipe for a mysterious ELIXIR',
+      initialWord: 'elixir',
+      finalWord: 'cyrillic',
       emoji:'🧙‍♂️⚗️'
     },
     {
       id: 'pasta',
       introText: 'a chef had been making PASTA all day and wanted to cook something different',
+      initialWord: 'pasta',
+      finalWord: 'tapas',
       emoji:'👨‍🍳🍝',
     }
     // engine -> ninja
@@ -38,12 +44,29 @@ const init = (rootNode) => {
 
   let state = {};
 
+  const setNarration = (text, millis) => {
+    const {
+      narration
+    } = state.nodes;
+    narration.innerText = text;
+    narration.classList.add('visible');
+    setTimeout(() => {
+      narration.classList.remove('visible');
+      narration.innerText = null;
+    }, millis)
+  };
+
   const scenes = {
-    start: () => {
+    titleScreen: () => {
+      //add overlay to root node
+      //show splash text
+      // homage to henshin tunnel
+      // click to continue
+    },
+    characterSelect: () => {
       return {
         render: () => {
           const {
-            narration,
             buttons,
             stage
           } = state.nodes;
@@ -52,10 +75,10 @@ const init = (rootNode) => {
           for (let i = 0; i<characterButtons.length ; i++) {
             buttons.appendChild(characterButtons[i]);
           }
-          narration.classList.add('expanded');
-          narration.innerText = 'A mysterious portal has opened in the village...' +
-            'what will happen to the villagers who wander in?';
-
+          setNarration('A mysterious portal has opened in the village...', 1500);
+          setTimeout(() => {
+            setNarration('what will happen to the villagers who wander in?', 1500);
+          }, 1500);
           stage.appendChild(portal())
         }
       }
@@ -67,14 +90,10 @@ const init = (rootNode) => {
         render: () => {
           const {
             stage,
-            narration,
             buttons
           } = state.nodes;
 
-          narration.innerHTML = item.introText;
-          narration.classList.add('expanded');
-          stage.classList.add('expanded');
-          buttons.classList.add('collapsed');
+          setNarration(item.introText, 5000);
         }
       }
     },
@@ -83,16 +102,20 @@ const init = (rootNode) => {
         render: () => {
           const {
             stage,
-            narration
           } = state.nodes;
-          narration.innerHTML = "TRANSFORMING";
+          setNarration(item.initialWord, 1000);
           stage.querySelector('.portal').classList.add('move-left');
+          setTimeout(() => {
+            setScene(scenes.reveal(item))
+          }, 7000);
         }
       }
     },
-    reveal: () => {
+    reveal: (item) => {
       return {
         render: () => {
+          setNarration(item.finalWord, 1000);
+          // add a 'restart' button
         }
       }
     }
@@ -134,6 +157,8 @@ const init = (rootNode) => {
     buttons: rootNode.querySelector('#buttons'),
     narration: rootNode.querySelector('#narration')
   };
-  state.scene = scenes.start();
+
+  // TODO: make title screen the first screen
+  state.scene = scenes.characterSelect();
   render();
 };
