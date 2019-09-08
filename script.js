@@ -1,31 +1,9 @@
 
-
-
-const scenes = [
-  'characterSelect', // intro splash blurb
-    // possibly have the little emoji characters milling around
-    // tap to focus and then can drag?
-  'approach', // item moving onto the stage
-    // animation of heading text
-    // animation of motion
-  'transforming', // some kind of effect
-    // particle effects
-    // grayscale
-    // swirling, rotating motion getting faster
-    // invisible inside box, box is rotationg,
-    // allow some kind of finger-dragging motion?
-    // they pull the character 'up' into the tunnel and as they move them through it the sound effect happens, then they drop into the new space
-    // a portal of pure sound - some kind of waveform visualization happens, maybe incorporating the emoji, and they get pulled through it
-  'reveal', // they've emerged back into the other side
-    // there's an action to return back to the characterSelect by clicking, and this character drops into the starting collection
-]
-
 const init = (rootNode) => {
-
-
   const items = [
     {
       id: 'elixir',
+      audio: '/audio/elixir.m4a',
       introText: 'a wizard was trying to decipher a recipe for a mysterious ELIXIR',
       initialWord: 'elixir',
       finalWord: 'cyrillic',
@@ -36,11 +14,19 @@ const init = (rootNode) => {
       introText: 'a chef had been making PASTA all day and wanted to cook something different',
       initialWord: 'pasta',
       finalWord: 'tapas',
-      emoji:'👨‍🍳🍝',
+      emoji:'👨‍🍳🍝🇮🇹',
+      finalEmoji:'👨‍🍳🥘🇪🇸',
+    },
+    {
+      id: 'engine',
+      introText: 'a driver was having trouble with the ENGINE of their car',
+      emoji: '🚗🤔🆘',
+      finalEmoji: '😮👤🏯'
     }
     // engine -> ninja
     // eclipsed -> lipstick
   ];
+
 
   let state = {};
 
@@ -58,10 +44,18 @@ const init = (rootNode) => {
 
   const scenes = {
     titleScreen: () => {
-      //add overlay to root node
-      //show splash text
-      // homage to henshin tunnel
-      // click to continue
+      return {
+        render: () => {
+          const {
+            stage,
+          } = state.nodes;
+          stage.appendChild(Portal());
+          stage.appendChild(P('A mysterious portal has opened in the village...'));
+          stage.appendChild(P('when villagers wander in, they think they\'re talking about one thing, but end up saying something else'));
+          stage.appendChild(Button('Start', () => setScene(scenes.characterSelect())));
+        }
+      }
+
     },
     characterSelect: () => {
       return {
@@ -70,16 +64,13 @@ const init = (rootNode) => {
             buttons,
             stage
           } = state.nodes;
-
+          clear(stage);
+          clear(buttons);
           let characterButtons = items.map(ItemButton);
           for (let i = 0; i<characterButtons.length ; i++) {
             buttons.appendChild(characterButtons[i]);
           }
-          setNarration('A mysterious portal has opened in the village...', 1500);
-          setTimeout(() => {
-            setNarration('what will happen to the villagers who wander in?', 1500);
-          }, 1500);
-          stage.appendChild(portal())
+          stage.appendChild(Portal())
         }
       }
     },
@@ -92,7 +83,8 @@ const init = (rootNode) => {
             stage,
             buttons
           } = state.nodes;
-
+          clear(buttons);
+          stage.appendChild(Audio(item.audio));
           setNarration(item.introText, 5000);
         }
       }
@@ -114,7 +106,11 @@ const init = (rootNode) => {
     reveal: (item) => {
       return {
         render: () => {
+          const {
+            buttons,
+          } = state.nodes;
           setNarration(item.finalWord, 1000);
+          buttons.append(Button('Return', () => { setScene(scenes.characterSelect()) }));
           // add a 'restart' button
         }
       }
@@ -137,7 +133,33 @@ const init = (rootNode) => {
     return button;
   };
 
-  const portal = () => {
+  const Audio = (url) => {
+    let node = document.createElement('audio');
+    node.src = url;
+    node.controls = false;
+    node.autoplay = true;
+    return node;
+  };
+
+  const P = (text) => {
+    let p = document.createElement('p');
+    p.appendChild(document.createTextNode(text));
+    return p;
+  };
+
+  const Button = (text, onClick) => {
+    let button = document.createElement('button');
+    button.appendChild(document.createTextNode(text));
+    button.onclick = onClick;
+    return button;
+  };
+
+  const clear = (node) => {
+    [...node.childNodes].map(e => node.removeChild(e));
+  };
+
+
+  const Portal = () => {
     let portal = document.createElement('div');
     portal.classList.add('portal');
     const entrance = document.createElement('div');
@@ -155,10 +177,10 @@ const init = (rootNode) => {
   state.nodes = {
     stage: rootNode.querySelector('#stage'),
     buttons: rootNode.querySelector('#buttons'),
-    narration: rootNode.querySelector('#narration')
+    narration: rootNode.querySelector('#narration'),
+    root: rootNode,
   };
 
-  // TODO: make title screen the first screen
-  state.scene = scenes.characterSelect();
+  state.scene = scenes.titleScreen();
   render();
 };
