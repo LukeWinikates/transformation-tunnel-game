@@ -38,12 +38,19 @@ button {
   font-size: 20px;
   width: calc(50% - 10px);
   margin: 5px;
-  transition: background-color .3s ease-in;
+  transition: background-color,width,margin,font-size .3s ease-in;
   cursor: pointer;
 }
 
 button:hover {
   background-color: var(--sea-blue);
+}
+
+button.growing {
+  background-color: var(--sea-blue);
+  width: 100%;
+  margin: 0;
+  font-size: 48px;
 }
 
 .container {
@@ -68,7 +75,7 @@ button:hover {
   height: 20%;
   color: transparent;
   overflow: hidden;
-  transition: all 1s ease-in;
+  /*transition: all 1s ease-in;*/
 }
 
 #narration.visible {
@@ -122,4 +129,28 @@ button:hover {
 
 .move-left {
   margin-left: -1000px;
+}
+
+@keyframes transition-left {
+  from {
+    left: 100%;
+    width: 300%;
+  }
+
+  to {
+    left: -100%;
+    width: 100%;
+  }
+}
+
+.scrolling-text {
+  position: relative;
+  animation-duration: 10s;
+  animation-name: transition-left;
+  width: 1000px;
+  display: flex;
+}
+
+.scrolling-text-item {
+  flex-grow:1;
 }

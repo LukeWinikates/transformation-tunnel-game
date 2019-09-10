@@ -7,7 +7,9 @@ const init = (rootNode) => {
       introText: 'a wizard was trying to decipher a recipe for a mysterious ELIXIR',
       initialWord: 'elixir',
       finalWord: 'cyrillic',
-      emoji:'🧙‍♂️⚗️'
+      emoji:'🧙‍♂️⚗️',
+      transitions: ['elixir','elixir','elixir','xerilic','xerilic','xerillic', 'cyrillic'],
+      finalText: 'the recipe is in CYRILLIC!'
     },
     {
       id: 'pasta',
@@ -16,17 +18,21 @@ const init = (rootNode) => {
       finalWord: 'tapas',
       emoji:'👨‍🍳🍝🇮🇹',
       finalEmoji:'👨‍🍳🥘🇪🇸',
+      transitions: ['pasta','pasta','apast','apast','apast','tapas','tapas','tapas'],
+      finalText: 'I can freshen things up by making lots of tasty TAPAS!'
+
     },
     {
       id: 'engine',
-      introText: 'a driver was having trouble with the ENGINE of their car',
-      emoji: '🚗🤔🆘',
-      finalEmoji: '😮👤🏯'
+      introText: 'a farmer was having trouble with the ENGINE of their car',  // ninja appears to deliver the package.
+      emoji: '👨‍🌾🚚🆘',
+      finalEmoji: '😮👤🏯',
+      finalWord: 'ninja',
+      transitions: ['engine','engine','engin','enjin','njine','ninja','ninja'],
+      finalText: "I can hire a NINJA to deliver the crops and nobody will know it wasn't me!"
     }
-    // engine -> ninja
     // eclipsed -> lipstick
   ];
-
 
   let state = {};
 
@@ -37,7 +43,7 @@ const init = (rootNode) => {
     narration.innerText = text;
     narration.classList.add('visible');
     setTimeout(() => {
-      narration.classList.remove('visible');
+      // narration.classList.remove('visible');
       narration.innerText = null;
     }, millis)
   };
@@ -65,7 +71,7 @@ const init = (rootNode) => {
             stage
           } = state.nodes;
           clear(stage);
-          clear(buttons);
+          // clear(buttons);
           let characterButtons = items.map(ItemButton);
           for (let i = 0; i<characterButtons.length ; i++) {
             buttons.appendChild(characterButtons[i]);
@@ -74,8 +80,8 @@ const init = (rootNode) => {
         }
       }
     },
-    approach: (item) => {
-      setTimeout(()=> setScene(scenes.transforming(item)), 2500);
+    approach: (item, button) => {
+      setTimeout(()=> setScene(scenes.transforming(item)), 5001);
       return {
         item,
         render: () => {
@@ -83,7 +89,12 @@ const init = (rootNode) => {
             stage,
             buttons
           } = state.nodes;
-          clear(buttons);
+          button.classList.add('growing');
+          [...buttons.children].forEach((b) => {
+            if(b !== button) {
+              buttons.removeChild(b);
+            }
+          });
           stage.appendChild(Audio(item.audio));
           setNarration(item.introText, 5000);
         }
@@ -93,13 +104,17 @@ const init = (rootNode) => {
       return {
         render: () => {
           const {
+            narration,
             stage,
           } = state.nodes;
-          setNarration(item.initialWord, 1000);
+          clear(narration);
+          setTimeout(()=> {
+            narration.appendChild(ScrollingNarration(item.transitions));
+          }, 1);
           stage.querySelector('.portal').classList.add('move-left');
           setTimeout(() => {
             setScene(scenes.reveal(item))
-          }, 7000);
+          }, 12000);
         }
       }
     },
@@ -108,10 +123,11 @@ const init = (rootNode) => {
         render: () => {
           const {
             buttons,
+            narration,
           } = state.nodes;
-          setNarration(item.finalWord, 1000);
+          clear(narration);
+          setNarration(item.finalText, 1000000);
           buttons.append(Button('Return', () => { setScene(scenes.characterSelect()) }));
-          // add a 'restart' button
         }
       }
     }
@@ -129,7 +145,10 @@ const init = (rootNode) => {
   const ItemButton = (item) => {
     let button = document.createElement('button');
     button.appendChild(document.createTextNode(item.emoji));
-    button.onclick = () => setScene(scenes.approach(item));
+    button.onclick = () => {
+      setScene(scenes.approach(item, button));
+
+    };
     return button;
   };
 
@@ -154,10 +173,21 @@ const init = (rootNode) => {
     return button;
   };
 
+  const ScrollingNarration = (items) => {
+    let container = document.createElement('div');
+    container.classList.add('scrolling-text');
+    items.forEach((item)=> {
+      let text = document.createElement('div');
+      text.classList.add('scrolling-text-item');
+      text.appendChild(document.createTextNode(item));
+      container.appendChild(text);
+    });
+    return container;
+  };
+
   const clear = (node) => {
     [...node.childNodes].map(e => node.removeChild(e));
   };
-
 
   const Portal = () => {
     let portal = document.createElement('div');
