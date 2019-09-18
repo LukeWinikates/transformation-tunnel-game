@@ -59,6 +59,8 @@ const init = (rootNode) => {
           stage.appendChild(P('A mysterious portal has opened in the village...'));
           stage.appendChild(P('when villagers wander in, they think they\'re talking about one thing, but end up saying something else'));
           stage.appendChild(Button('Start', () => setScene(scenes.characterSelect())));
+          stage.appendChild(P('Inspired by the henshin tunnel series by AKIYAMA TADASHI'));
+          stage.appendChild(P('Special thanks to CMU Pronouncing Dictionary, PostgreSQL, Array#rotate'));
         }
       }
 

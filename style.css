@@ -2,6 +2,10 @@
   --yellow: #e2ac22;
   --sea-blue: #0e6297;
   --red: #a40016;
+  --grass-green: #8fc93a;
+  --leafy-green: #5fad56;
+  --kombu-green: #344a16;
+  --jungle-green: #233f20;
   --orange: #e96214;
   --dark-neutral: #4e493c;
   --light-neutral: #eeeeed;
@@ -9,11 +13,11 @@
 
 * {
   box-sizing: border-box;
-  font-family: "Lucida Grande", "Trebuchet MS", sans-serif;
 }
 
 
 body {
+  font-family: "Lucida Grande", "Trebuchet MS", sans-serif;
   margin: 0;
   background: repeating-linear-gradient(
     var(--yellow),
@@ -29,6 +33,21 @@ body {
     var(--dark-neutral) 120px,
     var(--dark-neutral) 122px
   );
+}
+
+.title {
+  font-family: 'Andale Mono', 'Monaco';
+}
+
+.title * {
+  margin: 10px;
+}
+
+.title h3 {
+  border-bottom: 2px dotted var(--dark-neutral);
+  width: max-content;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 button {
