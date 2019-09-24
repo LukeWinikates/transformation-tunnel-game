@@ -34,124 +34,60 @@ const init = (rootNode) => {
     // eclipsed -> lipstick
   ];
 
-  let state = {};
-
-  const setNarration = (text, millis) => {
-    const {
-      narration
-    } = state.nodes;
-    narration.innerText = text;
-    narration.classList.add('visible');
-    setTimeout(() => {
-      // narration.classList.remove('visible');
-      narration.innerText = null;
-    }, millis)
+  let state = {
+    titleScreenVisible: true,
+    panelVisible: false,
+    cameraPosition: {x: 0, y: 0},
   };
-
-  const scenes = {
-    titleScreen: () => {
-      return {
-        render: () => {
-          const {
-            stage,
-          } = state.nodes;
-          stage.appendChild(Portal());
-          stage.appendChild(P('A mysterious portal has opened in the village...'));
-          stage.appendChild(P('when villagers wander in, they think they\'re talking about one thing, but end up saying something else'));
-          stage.appendChild(Button('Start', () => setScene(scenes.characterSelect())));
-          stage.appendChild(P('Inspired by the henshin tunnel series by AKIYAMA TADASHI'));
-          stage.appendChild(P('Special thanks to CMU Pronouncing Dictionary, PostgreSQL, Array#rotate'));
-        }
-      }
-
-    },
-    characterSelect: () => {
-      return {
-        render: () => {
-          const {
-            buttons,
-            stage
-          } = state.nodes;
-          clear(stage);
-          // clear(buttons);
-          let characterButtons = items.map(ItemButton);
-          for (let i = 0; i<characterButtons.length ; i++) {
-            buttons.appendChild(characterButtons[i]);
-          }
-          stage.appendChild(Portal())
-        }
-      }
-    },
-    approach: (item, button) => {
-      setTimeout(()=> setScene(scenes.transforming(item)), 5001);
-      return {
-        item,
-        render: () => {
-          const {
-            stage,
-            buttons
-          } = state.nodes;
-          button.classList.add('growing');
-          [...buttons.children].forEach((b) => {
-            if(b !== button) {
-              buttons.removeChild(b);
-            }
-          });
-          stage.appendChild(Audio(item.audio));
-          setNarration(item.introText, 5000);
-        }
-      }
-    },
-    transforming: (item) => {
-      return {
-        render: () => {
-          const {
-            narration,
-            stage,
-          } = state.nodes;
-          clear(narration);
-          setTimeout(()=> {
-            narration.appendChild(ScrollingNarration(item.transitions));
-          }, 1);
-          stage.querySelector('.portal').classList.add('move-left');
-          setTimeout(() => {
-            setScene(scenes.reveal(item))
-          }, 12000);
-        }
-      }
-    },
-    reveal: (item) => {
-      return {
-        render: () => {
-          const {
-            buttons,
-            narration,
-          } = state.nodes;
-          clear(narration);
-          setNarration(item.finalText, 1000000);
-          buttons.append(Button('Return', () => { setScene(scenes.characterSelect()) }));
-        }
-      }
-    }
-  };
-
-  const setScene = scene => {
-    state.scene = scene;
-    render();
-  };
-
   const render = () => {
-    state.scene.render();
+    return [
+      Portal(),
+      state.titleScreenVisible && Title(),
+      state.panelVisible && ButtonPanel()
+    ].filter(i => !!i);
   };
 
   const ItemButton = (item) => {
     let button = document.createElement('button');
-    button.appendChild(document.createTextNode(item.emoji));
+    button.appendChild(document.createTextNode(item.emoji.slice(0,5)));
     button.onclick = () => {
-      setScene(scenes.approach(item, button));
+      // approach;
+      // pan
+      // enter
+      // can translucency be a gradient?
+      // emerge out the far end
+      // lots of request animation frame
 
     };
     return button;
+  };
+
+  const ButtonPanel = () => {
+    let panel = document.createElement('div');
+    panel.classList.add('button-panel');
+    let characterButtons = items.map(ItemButton);
+    for (let i = 0; i<characterButtons.length ; i++) {
+      panel.appendChild(characterButtons[i]);
+    }
+    return panel;
+  };
+
+  const Title = () => {
+    let panel = document.createElement('div');
+    panel.classList.add('title-panel');
+    panel.appendChild(P('A mysterious portal has opened in a quiet village...'));
+    panel.appendChild(P('when villagers wander in, they think they\'re talking about one thing, but end up saying something else'));
+    panel.appendChild(Button('Start', () => {
+      state = {
+        ...state,
+        titleScreenVisible: false,
+        panelVisible: true,
+      };
+      draw();
+    }));
+    panel.appendChild(P('Inspired by the henshin tunnel series by AKIYAMA TADASHI'));
+    panel.appendChild(P('Special thanks to CMU Pronouncing Dictionary, PostgreSQL, Array#rotate'));
+    return panel;
   };
 
   const Audio = (url) => {
@@ -175,18 +111,6 @@ const init = (rootNode) => {
     return button;
   };
 
-  const ScrollingNarration = (items) => {
-    let container = document.createElement('div');
-    container.classList.add('scrolling-text');
-    items.forEach((item)=> {
-      let text = document.createElement('div');
-      text.classList.add('scrolling-text-item');
-      text.appendChild(document.createTextNode(item));
-      container.appendChild(text);
-    });
-    return container;
-  };
-
   const clear = (node) => {
     [...node.childNodes].map(e => node.removeChild(e));
   };
@@ -208,11 +132,16 @@ const init = (rootNode) => {
 
   state.nodes = {
     stage: rootNode.querySelector('#stage'),
-    buttons: rootNode.querySelector('#buttons'),
-    narration: rootNode.querySelector('#narration'),
     root: rootNode,
   };
 
-  state.scene = scenes.titleScreen();
-  render();
+  const draw = () => {
+    let nodes = render();
+    clear(state.nodes.stage);
+    [...nodes].forEach(n => {
+      state.nodes.stage.appendChild(n);
+    })
+  };
+
+  draw();
 };
