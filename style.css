@@ -52,15 +52,20 @@ body {
 
 .button-panel {
   position: relative;
-  width: 120px;
+  width: 100px;
   height: 800px;
-  left: 0;
+  left: -120px;
   display: flex;
   flex-direction: column;
+  transition: left .3s linear;
+}
+
+.button-panel.visible {
+  left: 0;
 }
 
 .button-panel button {
-  width: 100%;
+  width: calc(100% - 10px);
 }
 
 button {
@@ -68,7 +73,7 @@ button {
   border-radius: 3px;
   border: 1px solid var(--sea-blue);
   font-size: 20px;
-  width: calc(50% - 10px);
+  /*width: calc(50% - 10px);*/
   margin: 5px;
   transition: background-color,width,margin,font-size .3s ease-in;
   cursor: pointer;

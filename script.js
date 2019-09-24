@@ -34,6 +34,30 @@ const init = (rootNode) => {
     // eclipsed -> lipstick
   ];
 
+  const element = (tag, {classList = [], key}, children = []) => {
+    let e = document.createElement(tag);
+    classList.forEach(c => {
+      e.classList.add(c);
+    });
+    children.forEach(c => {
+      e.appendChild(c);
+    });
+    return e;
+  };
+
+  const elementBuilders = (tagNames) => {
+    return tagNames.reduce((acc, tagName) => {
+      return {
+        ...acc,
+        [tagName]: (...args) => element.apply(null, [tagName, ...args])
+      }
+    }, {});
+  };
+
+  const  {
+    div, p, button
+  } = elementBuilders(['div', 'p', 'button']);
+
   let state = {
     titleScreenVisible: true,
     panelVisible: false,
@@ -42,8 +66,8 @@ const init = (rootNode) => {
   const render = () => {
     return [
       Portal(),
-      state.titleScreenVisible && Title(),
-      state.panelVisible && ButtonPanel()
+      state.titleScreenVisible && Title({visible: state.titleScreenVisible}),
+      ButtonPanel({visible: state.panelVisible})
     ].filter(i => !!i);
   };
 
@@ -51,6 +75,11 @@ const init = (rootNode) => {
     let button = document.createElement('button');
     button.appendChild(document.createTextNode(item.emoji.slice(0,5)));
     button.onclick = () => {
+      state = {
+        ...state,
+        panelVisible: false,
+      };
+      draw();
       // approach;
       // pan
       // enter
@@ -62,32 +91,27 @@ const init = (rootNode) => {
     return button;
   };
 
-  const ButtonPanel = () => {
-    let panel = document.createElement('div');
-    panel.classList.add('button-panel');
-    let characterButtons = items.map(ItemButton);
-    for (let i = 0; i<characterButtons.length ; i++) {
-      panel.appendChild(characterButtons[i]);
-    }
-    return panel;
+  const ButtonPanel = ({visible}) => {
+    return div({
+      classList: ['button-panel', visible && 'visible'].filter(i => !!i)
+    }, items.map(ItemButton));
   };
 
-  const Title = () => {
-    let panel = document.createElement('div');
-    panel.classList.add('title-panel');
-    panel.appendChild(P('A mysterious portal has opened in a quiet village...'));
-    panel.appendChild(P('when villagers wander in, they think they\'re talking about one thing, but end up saying something else'));
-    panel.appendChild(Button('Start', () => {
-      state = {
-        ...state,
-        titleScreenVisible: false,
-        panelVisible: true,
-      };
-      draw();
-    }));
-    panel.appendChild(P('Inspired by the henshin tunnel series by AKIYAMA TADASHI'));
-    panel.appendChild(P('Special thanks to CMU Pronouncing Dictionary, PostgreSQL, Array#rotate'));
-    return panel;
+  const Title = ({visible}) => {
+    return div({classList: ['title-panel']}, [
+      P('A mysterious portal has opened in a quiet village...'),
+      P('when villagers wander in, they think they\'re talking about one thing, but end up saying something else'),
+      Button('Start', () => {
+        state = {
+          ...state,
+          titleScreenVisible: false,
+          panelVisible: true,
+        };
+        draw();
+      }),
+      P('Inspired by the henshin tunnel series by AKIYAMA TADASHI'),
+      P('Special thanks to CMU Pronouncing Dictionary, PostgreSQL, Array#rotate')
+    ]);
   };
 
   const Audio = (url) => {
@@ -99,16 +123,13 @@ const init = (rootNode) => {
   };
 
   const P = (text) => {
-    let p = document.createElement('p');
-    p.appendChild(document.createTextNode(text));
-    return p;
+    return(p ({}, [document.createTextNode(text)]));
   };
 
   const Button = (text, onClick) => {
-    let button = document.createElement('button');
-    button.appendChild(document.createTextNode(text));
-    button.onclick = onClick;
-    return button;
+    let b = button({}, [document.createTextNode(text)]);
+    b.onclick = onClick;
+    return b;
   };
 
   const clear = (node) => {
