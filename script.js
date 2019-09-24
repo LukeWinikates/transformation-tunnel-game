@@ -34,13 +34,30 @@ const init = (rootNode) => {
     // eclipsed -> lipstick
   ];
 
-  const element = (tag, {classList = [], key}, children = []) => {
+  const element = (tag, {classList = [], key, ...rest}, children = []) => {
     let e = document.createElement(tag);
     classList.forEach(c => {
       e.classList.add(c);
     });
     children.forEach(c => {
       e.appendChild(c);
+    });
+    Object.entries(rest).forEach(([attr, val]) => {
+      e.setAttribute(attr,val);
+    });
+    return e;
+  };
+
+  const svgElement = (tag, {classList = [], key, svgAttrs = {}, ...rest}, children = []) => {
+    let e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    children.forEach(c => {
+      e.appendChild(c);
+    });
+    Object.entries(svgAttrs).forEach(([attr, val]) => {
+      e.setAttributeNS('http://www.w3.org/1999/xlink', attr,val);
+    });
+    Object.entries(rest).forEach(([attr, val]) => {
+      e.setAttribute(attr,val);
     });
     return e;
   };
@@ -54,17 +71,33 @@ const init = (rootNode) => {
     }, {});
   };
 
+  const svgElementBuilders = (tagNames) => {
+    return tagNames.reduce((acc, tagName) => {
+      return {
+        ...acc,
+        [tagName]: (...args) => svgElement.apply(null, [tagName, ...args])
+      }
+    }, {});
+  };
+
   const  {
     div, p, button
   } = elementBuilders(['div', 'p', 'button']);
+  const  {
+    svg, circle, ellipse
+  } = svgElementBuilders(['svg', 'circle', 'ellipse']);
 
   let state = {
     titleScreenVisible: true,
     panelVisible: false,
     cameraPosition: {x: 0, y: 0},
+    world: [
+    ]
   };
+
   const render = () => {
     return [
+      World(),
       Portal(),
       state.titleScreenVisible && Title({visible: state.titleScreenVisible}),
       ButtonPanel({visible: state.panelVisible})
@@ -72,9 +105,7 @@ const init = (rootNode) => {
   };
 
   const ItemButton = (item) => {
-    let button = document.createElement('button');
-    button.appendChild(document.createTextNode(item.emoji.slice(0,5)));
-    button.onclick = () => {
+    return Button(item.emoji.slice(0,5),() => {
       state = {
         ...state,
         panelVisible: false,
@@ -86,9 +117,7 @@ const init = (rootNode) => {
       // can translucency be a gradient?
       // emerge out the far end
       // lots of request animation frame
-
-    };
-    return button;
+    });
   };
 
   const ButtonPanel = ({visible}) => {
@@ -137,18 +166,24 @@ const init = (rootNode) => {
   };
 
   const Portal = () => {
-    let portal = document.createElement('div');
-    portal.classList.add('portal');
-    const entrance = document.createElement('div');
-    entrance.classList.add('portal-entrance');
-    const body = document.createElement('div');
-    body.classList.add('portal-body');
-    const exit = document.createElement('div');
-    exit.classList.add('portal-exit');
-    portal.appendChild(entrance);
-    portal.appendChild(body);
-    portal.appendChild(exit);
-    return portal;
+    return div({classList: ['portal']}, [
+      div({classList: ['portal-entrance']}),
+      div({classList: ['portal-body']}),
+      div({classList: ['portal-exit']}),
+    ]);
+  };
+
+  const World = () => {
+    return svg({height: "500", width: "500"}, [
+      ellipse({
+        cx:"50",
+        cy:"50",
+        ry:"40",
+        rx: '15',
+        fill: '#e96214',
+        stroke: '#4e493c',
+      })
+    ]);
   };
 
   state.nodes = {

@@ -8,6 +8,7 @@
   --jungle-green: #233f20;
   --orange: #e96214;
   --dark-neutral: #4e493c;
+  --tinge-neutral: #dedddb;
   --light-neutral: #eeeeed;
 }
 
@@ -51,13 +52,14 @@ body {
 }
 
 .button-panel {
-  position: relative;
+  position: absolute;
   width: 100px;
-  height: 800px;
+  height: 70%;
   left: -120px;
   display: flex;
   flex-direction: column;
   transition: left .3s linear;
+  bottom: 0;
 }
 
 .button-panel.visible {
@@ -91,6 +93,7 @@ button:hover {
   height: calc(100vh - 40px);
 
   margin: 20px auto;
+  padding: 10px;
 
   background-color: var(--light-neutral);
 
@@ -102,9 +105,11 @@ button:hover {
 }
 
 #stage {
-  min-height: 40%;
   padding: 20px;
   overflow: hidden;
+  background-color: var(--tinge-neutral);
+  border-radius: 3px;
+  border: 1px solid var(--dark-neutral);
 }
 
 .portal {
@@ -157,5 +162,14 @@ button:hover {
 }
 
 .title-panel {
+  position: absolute;
+  width: 300px;
+  margin: 0 10%;
+  bottom: 0;
+  height: 70%;
+}
 
+svg {
+  height: 100%;
+  width: 100%;
 }
