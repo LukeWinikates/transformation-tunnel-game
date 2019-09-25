@@ -54,12 +54,11 @@ body {
 .button-panel {
   position: absolute;
   width: 100px;
-  height: 70%;
   left: -120px;
   display: flex;
   flex-direction: column;
   transition: left .3s linear;
-  bottom: 0;
+  bottom: 10%;
 }
 
 .button-panel.visible {
@@ -75,7 +74,6 @@ button {
   border-radius: 3px;
   border: 1px solid var(--sea-blue);
   font-size: 20px;
-  /*width: calc(50% - 10px);*/
   margin: 5px;
   transition: background-color,width,margin,font-size .3s ease-in;
   cursor: pointer;
@@ -110,44 +108,10 @@ button:hover {
   background-color: var(--tinge-neutral);
   border-radius: 3px;
   border: 1px solid var(--dark-neutral);
-}
-
-.portal {
-  width: 1200px;
-  height: 80px;
-  transition: all 8s ease-in;
-  margin-left: 200px;
-  display: flex;
-  flex-direction: row;
-}
-
-.portal-entrance, .portal-exit, .portal-body {
   height: 100%;
-  background-color: var(--orange);
+  position: relative;
 }
 
-.portal-entrance, .portal-exit {
-  width: 30px;
-  border-radius: 50%;
-  border: 2px solid var(--dark-neutral);
-}
-
-.portal-entrance {
-  margin-right: -15px;
-  z-index: 20;
-}
-
-.portal-exit {
-  margin-left: -15px;
-}
-
-.portal-body {
-  width: 1000px;
-}
-
-.move-left {
-  margin-left: -1000px;
-}
 
 @keyframes transition-left {
   from {
@@ -163,10 +127,9 @@ button:hover {
 
 .title-panel {
   position: absolute;
-  width: 300px;
-  margin: 0 10%;
+  width: calc(80% - 40px);
+  margin: 10%;
   bottom: 0;
-  height: 70%;
 }
 
 svg {

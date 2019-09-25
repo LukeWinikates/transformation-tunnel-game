@@ -84,8 +84,8 @@ const init = (rootNode) => {
     div, p, button
   } = elementBuilders(['div', 'p', 'button']);
   const  {
-    svg, circle, ellipse
-  } = svgElementBuilders(['svg', 'circle', 'ellipse']);
+    svg, circle, ellipse, rect
+  } = svgElementBuilders(['svg', 'circle', 'ellipse', 'rect']);
 
   let state = {
     titleScreenVisible: true,
@@ -95,22 +95,33 @@ const init = (rootNode) => {
     ]
   };
 
+  const panViewBox = (i) => {
+    const svg = document.querySelector('svg');
+    setTimeout(() => {
+      let oldViewBox = svg.getAttribute('viewBox');
+      [x, y, w, h] = oldViewBox.split(' ');
+      let newViewBox = [i, y, w, h].join(' ');
+      svg.setAttribute('viewBox', newViewBox);
+      if(i < 500) { panViewBox(i+1) }
+    }, 5);
+  };
+
   const render = () => {
     return [
       World(),
-      Portal(),
       state.titleScreenVisible && Title({visible: state.titleScreenVisible}),
       ButtonPanel({visible: state.panelVisible})
     ].filter(i => !!i);
   };
 
   const ItemButton = (item) => {
-    return Button(item.emoji.slice(0,5),() => {
+    return Button(item.emoji.slice(0,5), () => {
       state = {
         ...state,
         panelVisible: false,
       };
       draw();
+      panViewBox(0);
       // approach;
       // pan
       // enter
@@ -165,24 +176,35 @@ const init = (rootNode) => {
     [...node.childNodes].map(e => node.removeChild(e));
   };
 
-  const Portal = () => {
-    return div({classList: ['portal']}, [
-      div({classList: ['portal-entrance']}),
-      div({classList: ['portal-body']}),
-      div({classList: ['portal-exit']}),
-    ]);
-  };
-
   const World = () => {
-    return svg({height: "500", width: "500"}, [
+    return svg({height: "500", width: "500", viewBox: '0 0 300 500'}, [
+      rect({
+        x: 250,
+        y: 110,
+        height: 80,
+        width: 400,
+        fill: '#e96214',
+        // stroke: '#4e493c',
+        // 'stroke-width': '2',
+      }),
       ellipse({
-        cx:"50",
-        cy:"50",
-        ry:"40",
+        cx:"250",
+        cy:"150",
+        ry:"38",
         rx: '15',
         fill: '#e96214',
         stroke: '#4e493c',
-      })
+        'stroke-width': '2',
+      }),
+      ellipse({
+        cx:"650",
+        cy:"150",
+        ry:"38",
+        rx: '15',
+        fill: '#e96214',
+        stroke: '#4e493c',
+        'stroke-width': '2',
+      }),
     ]);
   };
 
