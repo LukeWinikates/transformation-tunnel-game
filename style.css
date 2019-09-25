@@ -103,7 +103,6 @@ button:hover {
 }
 
 #stage {
-  padding: 20px;
   overflow: hidden;
   background-color: var(--tinge-neutral);
   border-radius: 3px;
@@ -127,8 +126,8 @@ button:hover {
 
 .title-panel {
   position: absolute;
-  width: calc(80% - 40px);
-  margin: 10%;
+  /*width: 80%;*/
+  margin: 15%;
   bottom: 0;
 }
 

@@ -7,6 +7,7 @@ const init = (rootNode) => {
       introText: 'a wizard was trying to decipher a recipe for a mysterious ELIXIR',
       initialWord: 'elixir',
       finalWord: 'cyrillic',
+      characterEmoji: '🧙‍♂',
       emoji:'🧙‍♂️⚗️',
       transitions: ['elixir','elixir','elixir','xerilic','xerilic','xerillic', 'cyrillic'],
       finalText: 'the recipe is in CYRILLIC!'
@@ -16,6 +17,7 @@ const init = (rootNode) => {
       introText: 'a chef had been making PASTA all day and wanted to cook something different',
       initialWord: 'pasta',
       finalWord: 'tapas',
+      characterEmoji:'👨‍🍳',
       emoji:'👨‍🍳🍝🇮🇹',
       finalEmoji:'👨‍🍳🥘🇪🇸',
       transitions: ['pasta','pasta','apast','apast','apast','tapas','tapas','tapas'],
@@ -25,6 +27,7 @@ const init = (rootNode) => {
     {
       id: 'engine',
       introText: 'a farmer was having trouble with the ENGINE of their car',  // ninja appears to deliver the package.
+      characterEmoji: '👨‍🌾',
       emoji: '👨‍🌾🚚🆘',
       finalEmoji: '😮👤🏯',
       finalWord: 'ninja',
@@ -53,6 +56,10 @@ const init = (rootNode) => {
     children.forEach(c => {
       e.appendChild(c);
     });
+    classList.forEach(c => {
+      e.classList.add(c);
+    });
+
     Object.entries(svgAttrs).forEach(([attr, val]) => {
       e.setAttributeNS('http://www.w3.org/1999/xlink', attr,val);
     });
@@ -87,6 +94,8 @@ const init = (rootNode) => {
     svg, circle, ellipse, rect
   } = svgElementBuilders(['svg', 'circle', 'ellipse', 'rect']);
 
+  const text = (content, opts) => svgElement('text', opts, [document.createTextNode(content)]);
+
   let state = {
     titleScreenVisible: true,
     panelVisible: false,
@@ -102,8 +111,43 @@ const init = (rootNode) => {
       [x, y, w, h] = oldViewBox.split(' ');
       let newViewBox = [i, y, w, h].join(' ');
       svg.setAttribute('viewBox', newViewBox);
-      if(i < 500) { panViewBox(i+1) }
+      if(i < 500) {
+        panViewBox(i+1);
+      } else {
+        restoreCharacter();
+        moveCharacter(0);
+      }
     }, 5);
+  };
+
+  const enterCharacter = (i) => {
+    const character = document.querySelector('.character');
+    setTimeout(() => {
+      character.setAttribute('x', +character.getAttribute('x') + 1);
+      if (i < 295) {
+        enterCharacter(i + 1)
+      } else {
+        character.remove();
+        panViewBox(0)
+      }
+    }, 5);
+  };
+
+  const moveCharacter = (i) => {
+    const character = document.querySelector('.character');
+    setTimeout(() => {
+      character.setAttribute('x', +character.getAttribute('x') + 1);
+      if (i < 60) {
+        moveCharacter(i + 1)
+      } else {
+      }
+    }, 5);
+  };
+
+  const restoreCharacter = (i) => {
+    const svg = document.querySelector('svg');
+    let character = text(state.character, {x: 635, y: 165, classList: ['character'], 'font-size': '36px'});
+    svg.appendChild(character);
   };
 
   const render = () => {
@@ -119,9 +163,10 @@ const init = (rootNode) => {
       state = {
         ...state,
         panelVisible: false,
+        character: item.characterEmoji,
       };
       draw();
-      panViewBox(0);
+      enterCharacter(0);
       // approach;
       // pan
       // enter
@@ -196,6 +241,7 @@ const init = (rootNode) => {
         stroke: '#4e493c',
         'stroke-width': '2',
       }),
+      state.character && text(state.character, {x: -50, y: 165, classList: ['character'], 'font-size': '36px'}),
       ellipse({
         cx:"650",
         cy:"150",
@@ -205,7 +251,7 @@ const init = (rootNode) => {
         stroke: '#4e493c',
         'stroke-width': '2',
       }),
-    ]);
+    ].filter(i => !!i));
   };
 
   state.nodes = {
