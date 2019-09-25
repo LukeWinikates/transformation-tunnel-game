@@ -120,6 +120,18 @@ const init = (rootNode) => {
     }, 5);
   };
 
+  const strobeTunnel = (i) => {
+    const tunnel = document.querySelectorAll('.tunnel');
+    setTimeout(() => {
+      [...tunnel].forEach(e => {
+        e.setAttribute('fill', e.getAttribute('fill') === '#e2ac22' ? '#e96214' :'#e2ac22')
+      });
+      if(i < 5) {
+        strobeTunnel(i+1);
+      }
+    }, 500);
+  };
+
   const dropDot = ({x,y}) => {
     let svg = document.querySelector('svg');
     let dot = circle({cx:x, cy:y+1, r : 3, fill: '#4e493c', classList: ['dropdot']});
@@ -147,7 +159,8 @@ const init = (rootNode) => {
         }
       } else {
         character.remove();
-        panViewBox(0)
+        panViewBox(0);
+        strobeTunnel(0);
       }
     }, 10);
   };
@@ -166,7 +179,7 @@ const init = (rootNode) => {
     }, 5);
   };
 
-  const restoreCharacter = (i) => {
+  const restoreCharacter = () => {
     const svg = document.querySelector('svg');
     let character = text(state.character, {x: 635, y: 165, classList: ['character'], 'font-size': '36px'});
     svg.appendChild(character);
@@ -246,6 +259,7 @@ const init = (rootNode) => {
   const World = () => {
     return svg({height: "500", width: "500", viewBox: '0 0 300 500'}, [
       rect({
+        classList: ['tunnel'],
         x: 250,
         y: 110,
         height: 80,
@@ -255,6 +269,7 @@ const init = (rootNode) => {
         // 'stroke-width': '2',
       }),
       ellipse({
+        classList: ['tunnel'],
         cx:"250",
         cy:"150",
         ry:"38",
@@ -265,6 +280,7 @@ const init = (rootNode) => {
       }),
       state.character && text(state.character, {x: -50, y: 165, classList: ['character'], 'font-size': '36px'}),
       ellipse({
+        classList: ['tunnel'],
         cx:"650",
         cy:"150",
         ry:"38",

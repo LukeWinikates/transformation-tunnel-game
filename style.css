@@ -139,3 +139,7 @@ svg {
 .dropdot {
   transition: fill 1s linear;
 }
+
+.tunnel {
+  transition: fill .5s ease-in;
+}
