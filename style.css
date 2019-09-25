@@ -135,3 +135,7 @@ svg {
   height: 100%;
   width: 100%;
 }
+
+.dropdot {
+  transition: fill 1s linear;
+}

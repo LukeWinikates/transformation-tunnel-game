@@ -120,17 +120,36 @@ const init = (rootNode) => {
     }, 5);
   };
 
+  const dropDot = ({x,y}) => {
+    let svg = document.querySelector('svg');
+    let dot = circle({cx:x, cy:y+1, r : 3, fill: '#4e493c', classList: ['dropdot']});
+    svg.appendChild(dot);
+    setTimeout(()=> {
+      dot.setAttribute('r', 2);
+      setTimeout(() => {
+        dot.setAttribute('fill', 'transparent');
+        setTimeout(()=> {
+          dot.remove();
+        }, 1000);
+      }, 500);
+    }, 250);
+
+  };
+
   const enterCharacter = (i) => {
     const character = document.querySelector('.character');
     setTimeout(() => {
       character.setAttribute('x', +character.getAttribute('x') + 1);
       if (i < 295) {
-        enterCharacter(i + 1)
+        enterCharacter(i + 1);
+        if(i % 30 === 0) {
+          dropDot({x: +character.getAttribute('x') + 1, y: +character.getAttribute('y')})
+        }
       } else {
         character.remove();
         panViewBox(0)
       }
-    }, 5);
+    }, 10);
   };
 
   const moveCharacter = (i) => {
@@ -138,7 +157,10 @@ const init = (rootNode) => {
     setTimeout(() => {
       character.setAttribute('x', +character.getAttribute('x') + 1);
       if (i < 60) {
-        moveCharacter(i + 1)
+        moveCharacter(i + 1);
+        if(i % 30 === 0) {
+          dropDot({x: +character.getAttribute('x') + 1, y: +character.getAttribute('y')})
+        }
       } else {
       }
     }, 5);
