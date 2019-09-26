@@ -1,4 +1,3 @@
-
 const init = (rootNode) => {
   const items = [
     {
@@ -8,8 +7,8 @@ const init = (rootNode) => {
       initialWord: 'elixir',
       finalWord: 'cyrillic',
       characterEmoji: '🧙‍♂',
-      emoji:'🧙‍♂️⚗️',
-      transitions: ['elixir','elixir','elixir','xerilic','xerilic','xerillic', 'cyrillic'],
+      emoji: '🧙‍♂️⚗️',
+      transitions: ['elixir', 'elixir', 'elixir', 'xerilic', 'xerilic', 'xerillic', 'cyrillic'],
       finalText: '"Of course! The recipe is in CYRILLIC!"'
     },
     {
@@ -17,10 +16,10 @@ const init = (rootNode) => {
       introText: 'a chef had been making PASTA all day and wanted to cook something different',
       initialWord: 'pasta',
       finalWord: 'tapas',
-      characterEmoji:'👨‍🍳',
-      emoji:'👨‍🍳🍝🇮🇹',
-      finalEmoji:'👨‍🍳🥘🇪🇸',
-      transitions: ['pasta','pasta','apast','apast','apast','tapas','tapas','tapas'],
+      characterEmoji: '👨‍🍳',
+      emoji: '👨‍🍳🍝🇮🇹',
+      finalEmoji: '👨‍🍳🥘🇪🇸',
+      transitions: ['pasta', 'pasta', 'apast', 'apast', 'apast', 'tapas', 'tapas', 'tapas'],
       finalText: '"I can freshen things up by making lots of tasty TAPAS!"'
 
     },
@@ -31,7 +30,7 @@ const init = (rootNode) => {
       emoji: '👨‍🌾🚚🆘',
       finalEmoji: '😮👤🏯',
       finalWord: 'ninja',
-      transitions: ['engine','engine','engin','enjin','njine','ninja','ninja'],
+      transitions: ['engine', 'engine', 'engin', 'enjin', 'njine', 'ninja', 'ninja'],
       finalText: '"I can hire a NINJA to deliver the crops and nobody will know it wasn\'t me!"'
     }
     // eclipsed -> lipstick
@@ -46,7 +45,7 @@ const init = (rootNode) => {
       e.appendChild(c);
     });
     Object.entries(rest).forEach(([attr, val]) => {
-      e.setAttribute(attr,val);
+      e.setAttribute(attr, val);
     });
     return e;
   };
@@ -61,10 +60,10 @@ const init = (rootNode) => {
     });
 
     Object.entries(svgAttrs).forEach(([attr, val]) => {
-      e.setAttributeNS('http://www.w3.org/1999/xlink', attr,val);
+      e.setAttributeNS('http://www.w3.org/1999/xlink', attr, val);
     });
     Object.entries(rest).forEach(([attr, val]) => {
-      e.setAttribute(attr,val);
+      e.setAttribute(attr, val);
     });
     return e;
   };
@@ -87,10 +86,10 @@ const init = (rootNode) => {
     }, {});
   };
 
-  const  {
+  const {
     div, p, button
   } = elementBuilders(['div', 'p', 'button']);
-  const  {
+  const {
     svg, circle, ellipse, rect
   } = svgElementBuilders(['svg', 'circle', 'ellipse', 'rect']);
 
@@ -99,9 +98,7 @@ const init = (rootNode) => {
   let state = {
     titleScreenVisible: true,
     panelVisible: false,
-    cameraPosition: {x: 0, y: 0},
-    world: [
-    ]
+    world: []
   };
 
   const panViewBox = (i) => {
@@ -111,8 +108,8 @@ const init = (rootNode) => {
       [x, y, w, h] = oldViewBox.split(' ');
       let newViewBox = [i, y, w, h].join(' ');
       svg.setAttribute('viewBox', newViewBox);
-      if(i < 500) {
-        panViewBox(i+1);
+      if (i < 500) {
+        panViewBox(i + 1);
       } else {
         restoreCharacter();
         moveCharacter(0);
@@ -124,23 +121,23 @@ const init = (rootNode) => {
     const tunnel = document.querySelectorAll('.tunnel');
     setTimeout(() => {
       [...tunnel].forEach(e => {
-        e.setAttribute('fill', e.getAttribute('fill') === '#e2ac22' ? '#e96214' :'#e2ac22')
+        e.setAttribute('fill', e.getAttribute('fill') === '#e2ac22' ? '#e96214' : '#e2ac22')
       });
-      if(i < 5) {
-        strobeTunnel(i+1);
+      if (i < 5) {
+        strobeTunnel(i + 1);
       }
     }, 500);
   };
 
-  const dropDot = ({x,y}) => {
+  const dropDot = ({x, y}) => {
     let svg = document.querySelector('svg');
-    let dot = circle({cx:x, cy:y+1, r : 3, fill: '#4e493c', classList: ['dropdot']});
+    let dot = circle({cx: x, cy: y + 1, r: 3, fill: '#4e493c', classList: ['dropdot']});
     svg.appendChild(dot);
-    setTimeout(()=> {
+    setTimeout(() => {
       dot.setAttribute('r', 2);
       setTimeout(() => {
         dot.setAttribute('fill', 'transparent');
-        setTimeout(()=> {
+        setTimeout(() => {
           dot.remove();
         }, 1000);
       }, 500);
@@ -154,7 +151,7 @@ const init = (rootNode) => {
       character.setAttribute('x', +character.getAttribute('x') + 1);
       if (i < 295) {
         enterCharacter(i + 1);
-        if(i % 30 === 0) {
+        if (i % 30 === 0) {
           dropDot({x: +character.getAttribute('x') + 1, y: +character.getAttribute('y')})
         }
       } else {
@@ -171,12 +168,17 @@ const init = (rootNode) => {
       character.setAttribute('x', +character.getAttribute('x') + 1);
       if (i < 60) {
         moveCharacter(i + 1);
-        if(i % 30 === 0) {
+        if (i % 30 === 0) {
           dropDot({x: +character.getAttribute('x') + 1, y: +character.getAttribute('y')})
         }
       } else {
+        showReturnButton();
       }
     }, 5);
+  };
+
+  const showReturnButton = () => {
+    state.nodes.stage.appendChild(ReturnPrompt());
   };
 
   const restoreCharacter = () => {
@@ -187,7 +189,7 @@ const init = (rootNode) => {
 
   const render = () => {
     return [
-      div({id: 'narration', classList: [ 'fade']}),
+      div({id: 'narration', classList: ['fade']}),
       World(),
       state.titleScreenVisible && Title({visible: state.titleScreenVisible}),
       ButtonPanel({visible: state.panelVisible})
@@ -213,7 +215,7 @@ const init = (rootNode) => {
   };
 
   const ItemButton = (item) => {
-    return Button(item.emoji.slice(0,5), () => {
+    return Button(item.emoji.slice(0, 5), () => {
       state = {
         ...state,
         panelVisible: false,
@@ -223,8 +225,9 @@ const init = (rootNode) => {
       enterCharacter(0);
       narrations([
         [1500, () => narrationText(item.introText)],
-        [3500, fadeNarration],
+        [5000, fadeNarration],
         [7000, () => narrationText(item.finalText)],
+        [10000, fadeNarration],
       ])
       // approach;
       // pan
@@ -239,6 +242,37 @@ const init = (rootNode) => {
     return div({
       classList: ['button-panel', visible && 'visible'].filter(i => !!i)
     }, items.map(ItemButton));
+  };
+
+  const scrollViewBoxBack = () => {
+    const svg = document.querySelector('svg');
+    setTimeout(() => {
+      let oldViewBox = svg.getAttribute('viewBox');
+      [x, y, w, h] = oldViewBox.split(' ');
+      let newViewBox = [x - 1, y, w, h].join(' ');
+      svg.setAttribute('viewBox', newViewBox);
+      if (+x > 0) {
+        scrollViewBoxBack();
+      } else {
+        setTimeout(() => {
+          state = {
+            ...state,
+            titleScreenVisible: false,
+            panelVisible: true,
+            character: null,
+          };
+          draw();
+        }, 200);
+      }
+    }, 5);
+  };
+
+  const ReturnPrompt = () => {
+    return div({classList: ['title-panel']}, [
+      Button('Return', () => {
+        scrollViewBoxBack();
+      })
+    ]);
   };
 
   const Title = ({visible}) => {
@@ -267,7 +301,7 @@ const init = (rootNode) => {
   };
 
   const P = (text) => {
-    return(p ({}, [document.createTextNode(text)]));
+    return (p({}, [document.createTextNode(text)]));
   };
 
   const Button = (text, onClick) => {
@@ -294,9 +328,9 @@ const init = (rootNode) => {
       }),
       ellipse({
         classList: ['tunnel'],
-        cx:"250",
-        cy:"250",
-        ry:"38",
+        cx: "250",
+        cy: "250",
+        ry: "38",
         rx: '15',
         fill: '#e96214',
         stroke: '#4e493c',
@@ -304,9 +338,9 @@ const init = (rootNode) => {
       }),
       ellipse({
         classList: ['tunnel'],
-        cx:"650",
-        cy:"250",
-        ry:"38",
+        cx: "650",
+        cy: "250",
+        ry: "38",
         rx: '15',
         fill: '#e96214',
         stroke: '#4e493c',

@@ -126,7 +126,7 @@ button:hover {
 
 .title-panel {
   position: absolute;
-  /*width: 80%;*/
+  width: 80%;
   margin: 15%;
   bottom: 0;
 }
