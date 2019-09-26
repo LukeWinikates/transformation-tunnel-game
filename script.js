@@ -127,16 +127,17 @@ const init = (rootNode) => {
     lighting.setAttribute('fill', color);
   };
 
-  const strobeTunnel = (i) => {
+  const strobeTunnel = () => {
     const tunnel = document.querySelectorAll('.tunnel');
-    setTimeout(() => {
-      [...tunnel].forEach(e => {
-        e.setAttribute('fill', e.getAttribute('fill') === '#e2ac22' ? '#e96214' : '#e2ac22')
-      });
-      if (i < 5) {
-        strobeTunnel(i + 1);
-      }
-    }, 500);
+    effects(repeat(4).map(i => {
+      return [
+        (i+1)*500, () => {
+          [...tunnel].forEach(e => {
+            e.setAttribute('fill', e.getAttribute('fill') === '#e2ac22' ? '#e96214' : '#e2ac22')
+          })
+        }
+      ]
+    }));
   };
 
   const dropDot = ({x, y}) => {
@@ -180,8 +181,8 @@ const init = (rootNode) => {
           [2100, () => flashLighting('transparent')],
           [2500, () => flashLighting('e96214')],
           [2600, () => flashLighting('transparent')],
-          [3000, () => flashLighting('e96214')],
-          [3100, () => flashLighting('transparent')],
+          // [3000, () => flashLighting('e96214')],
+          // [3100, () => flashLighting('transparent')],
         ]);
       }]
     ]);
