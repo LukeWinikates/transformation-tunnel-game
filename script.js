@@ -10,7 +10,7 @@ const init = (rootNode) => {
       characterEmoji: '🧙‍♂',
       emoji:'🧙‍♂️⚗️',
       transitions: ['elixir','elixir','elixir','xerilic','xerilic','xerillic', 'cyrillic'],
-      finalText: 'the recipe is in CYRILLIC!'
+      finalText: '"Of course! The recipe is in CYRILLIC!"'
     },
     {
       id: 'pasta',
@@ -21,7 +21,7 @@ const init = (rootNode) => {
       emoji:'👨‍🍳🍝🇮🇹',
       finalEmoji:'👨‍🍳🥘🇪🇸',
       transitions: ['pasta','pasta','apast','apast','apast','tapas','tapas','tapas'],
-      finalText: 'I can freshen things up by making lots of tasty TAPAS!'
+      finalText: '"I can freshen things up by making lots of tasty TAPAS!"'
 
     },
     {
@@ -32,7 +32,7 @@ const init = (rootNode) => {
       finalEmoji: '😮👤🏯',
       finalWord: 'ninja',
       transitions: ['engine','engine','engin','enjin','njine','ninja','ninja'],
-      finalText: "I can hire a NINJA to deliver the crops and nobody will know it wasn't me!"
+      finalText: '"I can hire a NINJA to deliver the crops and nobody will know it wasn\'t me!"'
     }
     // eclipsed -> lipstick
   ];
@@ -181,16 +181,35 @@ const init = (rootNode) => {
 
   const restoreCharacter = () => {
     const svg = document.querySelector('svg');
-    let character = text(state.character, {x: 635, y: 165, classList: ['character'], 'font-size': '36px'});
+    let character = text(state.character, {x: 635, y: 265, classList: ['character'], 'font-size': '36px'});
     svg.appendChild(character);
   };
 
   const render = () => {
     return [
+      div({id: 'narration', classList: [ 'fade']}),
       World(),
       state.titleScreenVisible && Title({visible: state.titleScreenVisible}),
       ButtonPanel({visible: state.panelVisible})
     ].filter(i => !!i);
+  };
+
+  const narrationText = (text) => {
+    const narration = state.nodes.stage.querySelector('#narration');
+    narration.classList.remove('fade');
+    clear(narration);
+    narration.appendChild(document.createTextNode(text));
+  };
+
+  const fadeNarration = () => {
+    const narration = state.nodes.stage.querySelector('#narration');
+    narration.classList.add('fade');
+  };
+
+  const narrations = (narrationsList) => {
+    narrationsList.map(([timing, f]) => {
+      setTimeout(f, timing);
+    });
   };
 
   const ItemButton = (item) => {
@@ -202,6 +221,11 @@ const init = (rootNode) => {
       };
       draw();
       enterCharacter(0);
+      narrations([
+        [1500, () => narrationText(item.introText)],
+        [3500, fadeNarration],
+        [7000, () => narrationText(item.finalText)],
+      ])
       // approach;
       // pan
       // enter
@@ -261,7 +285,7 @@ const init = (rootNode) => {
       rect({
         classList: ['tunnel'],
         x: 250,
-        y: 110,
+        y: 210,
         height: 80,
         width: 400,
         fill: '#e96214',
@@ -271,24 +295,24 @@ const init = (rootNode) => {
       ellipse({
         classList: ['tunnel'],
         cx:"250",
-        cy:"150",
+        cy:"250",
         ry:"38",
         rx: '15',
         fill: '#e96214',
         stroke: '#4e493c',
         'stroke-width': '2',
       }),
-      state.character && text(state.character, {x: -50, y: 165, classList: ['character'], 'font-size': '36px'}),
       ellipse({
         classList: ['tunnel'],
         cx:"650",
-        cy:"150",
+        cy:"250",
         ry:"38",
         rx: '15',
         fill: '#e96214',
         stroke: '#4e493c',
         'stroke-width': '2',
       }),
+      state.character && text(state.character, {x: -50, y: 265, classList: ['character'], 'font-size': '36px'}),
     ].filter(i => !!i));
   };
 

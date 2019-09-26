@@ -136,6 +136,22 @@ svg {
   width: 100%;
 }
 
+#narration {
+  opacity: 0.5;
+  transition: opacity 1s ease-out, color 1.5s ease-out;
+  position: absolute;
+  margin: 20px;
+  padding: 20px;
+  background-color: var(--jungle-green);
+  color: var(--light-neutral);
+  width: calc(100% - 40px);
+}
+
+#narration.fade {
+  opacity: 0;
+  color: transparent;
+}
+
 .dropdot {
   transition: fill 1s linear;
 }
