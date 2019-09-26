@@ -117,6 +117,11 @@ const init = (rootNode) => {
     }, 5);
   };
 
+  const flashLighting = color => {
+    const lighting = document.querySelector('.lighting-effect');
+    lighting.setAttribute('fill', color);
+  };
+
   const strobeTunnel = (i) => {
     const tunnel = document.querySelectorAll('.tunnel');
     setTimeout(() => {
@@ -158,6 +163,24 @@ const init = (rootNode) => {
         character.remove();
         panViewBox(0);
         strobeTunnel(0);
+        effects([
+          [500, () => flashLighting('e96214')],
+          [600, () => flashLighting('transparent')],
+          [1000, () => flashLighting('e2ac22')],
+          [1100, () => flashLighting('transparent')],
+          [1500, () => flashLighting('e96214')],
+          [1600, () => flashLighting('transparent')],
+          [2000, () => flashLighting('e2ac22')],
+          [2100, () => flashLighting('transparent')],
+          [2500, () => flashLighting('e96214')],
+          [2600, () => flashLighting('transparent')],
+          [3000, () => flashLighting('e96214')],
+          [3100, () => flashLighting('transparent')],
+          // [3500, () => flashLighting('e2ac22')],
+          // [3600, () => flashLighting('transparent')],
+          // [4000, () => flashLighting('e96214')],
+          // [4100, () => flashLighting('transparent')],
+        ]);
       }
     }, 10);
   };
@@ -208,8 +231,8 @@ const init = (rootNode) => {
     narration.classList.add('fade');
   };
 
-  const narrations = (narrationsList) => {
-    narrationsList.map(([timing, f]) => {
+  const effects = (effectsList) => {
+    effectsList.map(([timing, f]) => {
       setTimeout(f, timing);
     });
   };
@@ -223,7 +246,7 @@ const init = (rootNode) => {
       };
       draw();
       enterCharacter(0);
-      narrations([
+      effects([
         [1500, () => narrationText(item.introText)],
         [5000, fadeNarration],
         [7000, () => narrationText(item.finalText)],
@@ -257,9 +280,9 @@ const init = (rootNode) => {
             character: null,
           };
           draw();
-        }, 200);
+        }, 10);
       }
-    }, 1);
+    }, 200);
   };
 
   const ReturnPrompt = () => {
@@ -342,6 +365,7 @@ const init = (rootNode) => {
         'stroke-width': '2',
       }),
       state.character && text(state.character, {x: -50, y: 265, classList: ['character'], 'font-size': '36px'}),
+      rect({classList: ['lighting-effect'], x:-40, y:0, height: 500, width:1500, fill: 'transparent'}),
     ].filter(i => !!i));
   };
 
