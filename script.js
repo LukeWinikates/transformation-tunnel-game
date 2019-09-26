@@ -152,14 +152,16 @@ const init = (rootNode) => {
 
   const enterCharacter = (i) => {
     const character = document.querySelector('.character');
-    setTimeout(() => {
-      character.setAttribute('x', +character.getAttribute('x') + 1);
-      if (i < 295) {
-        enterCharacter(i + 1);
+    effects([...Array(295).keys()].map(i=> {
+      return [(i+1)*10, ()=> {
+        character.setAttribute('x', +character.getAttribute('x') + 1);
         if (i % 30 === 0) {
           dropDot({x: +character.getAttribute('x') + 1, y: +character.getAttribute('y')})
         }
-      } else {
+      }];
+    }));
+    effects([
+      [2950, ()=> {
         character.remove();
         panViewBox(0);
         strobeTunnel(0);
@@ -176,13 +178,9 @@ const init = (rootNode) => {
           [2600, () => flashLighting('transparent')],
           [3000, () => flashLighting('e96214')],
           [3100, () => flashLighting('transparent')],
-          // [3500, () => flashLighting('e2ac22')],
-          // [3600, () => flashLighting('transparent')],
-          // [4000, () => flashLighting('e96214')],
-          // [4100, () => flashLighting('transparent')],
         ]);
-      }
-    }, 10);
+      }]
+    ]);
   };
 
   const moveCharacter = (i) => {
