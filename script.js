@@ -229,12 +229,7 @@ const init = (rootNode) => {
         [7000, () => narrationText(item.finalText)],
         [10000, fadeNarration],
       ])
-      // approach;
-      // pan
-      // enter
       // can translucency be a gradient?
-      // emerge out the far end
-      // lots of request animation frame
     });
   };
 
@@ -264,7 +259,7 @@ const init = (rootNode) => {
           draw();
         }, 200);
       }
-    }, 5);
+    }, 1);
   };
 
   const ReturnPrompt = () => {
