@@ -103,18 +103,23 @@ const init = (rootNode) => {
 
   const panViewBox = (i) => {
     const svg = document.querySelector('svg');
-    setTimeout(() => {
-      let oldViewBox = svg.getAttribute('viewBox');
-      [x, y, w, h] = oldViewBox.split(' ');
-      let newViewBox = [i, y, w, h].join(' ');
-      svg.setAttribute('viewBox', newViewBox);
-      if (i < 500) {
-        panViewBox(i + 1);
-      } else {
+    effects(repeat(500).map(i => {
+      return [
+        (i + 1) * 5,
+        () => {
+          let oldViewBox = svg.getAttribute('viewBox');
+          [x, y, w, h] = oldViewBox.split(' ');
+          let newViewBox = [i, y, w, h].join(' ');
+          svg.setAttribute('viewBox', newViewBox);
+        }
+      ]
+    }));
+    effects([
+      [2500, () => {
         restoreCharacter();
         moveCharacter(0);
-      }
-    }, 5);
+      }]
+    ]);
   };
 
   const flashLighting = color => {
@@ -138,21 +143,20 @@ const init = (rootNode) => {
     let svg = document.querySelector('svg');
     let dot = circle({cx: x, cy: y + 1, r: 3, fill: '#4e493c', classList: ['dropdot']});
     svg.appendChild(dot);
-    setTimeout(() => {
-      dot.setAttribute('r', 2);
-      setTimeout(() => {
-        dot.setAttribute('fill', 'transparent');
-        setTimeout(() => {
-          dot.remove();
-        }, 1000);
-      }, 500);
-    }, 250);
-
+    effects([
+      [250, () => dot.setAttribute('r', 2)],
+      [500, () => dot.setAttribute('fill', 'transparent')],
+      [1000, () => dot.remove()]
+    ]);
   };
 
-  const enterCharacter = (i) => {
+  function repeat(times) {
+    return [...Array(times).keys()];
+  }
+
+  const enterCharacter = () => {
     const character = document.querySelector('.character');
-    effects([...Array(295).keys()].map(i=> {
+    effects(repeat(295).map(i=> {
       return [(i+1)*10, ()=> {
         character.setAttribute('x', +character.getAttribute('x') + 1);
         if (i % 30 === 0) {
@@ -183,19 +187,23 @@ const init = (rootNode) => {
     ]);
   };
 
-  const moveCharacter = (i) => {
+  const moveCharacter = () => {
     const character = document.querySelector('.character');
-    setTimeout(() => {
-      character.setAttribute('x', +character.getAttribute('x') + 1);
-      if (i < 60) {
-        moveCharacter(i + 1);
-        if (i % 30 === 0) {
-          dropDot({x: +character.getAttribute('x') + 1, y: +character.getAttribute('y')})
+    let moves = repeat(50).map(i => {
+      return [
+        (i+1) *5,
+        () => {
+          character.setAttribute('x', +character.getAttribute('x') + 1);
+          if (i % 30 === 0) {
+            dropDot({x: +character.getAttribute('x') + 1, y: +character.getAttribute('y')})
+          }
         }
-      } else {
-        showReturnButton();
-      }
-    }, 5);
+      ]
+    });
+    effects([
+      ...moves,
+      [250, showReturnButton]
+    ]);
   };
 
   const showReturnButton = () => {
@@ -265,22 +273,20 @@ const init = (rootNode) => {
     setTimeout(() => {
       let oldViewBox = svg.getAttribute('viewBox');
       [x, y, w, h] = oldViewBox.split(' ');
-      let newViewBox = [x - 1, y, w, h].join(' ');
+      let newViewBox = [x - 2, y, w, h].join(' ');
       svg.setAttribute('viewBox', newViewBox);
       if (+x > 0) {
         scrollViewBoxBack();
       } else {
-        setTimeout(() => {
-          state = {
-            ...state,
-            titleScreenVisible: false,
-            panelVisible: true,
-            character: null,
-          };
-          draw();
-        }, 10);
+        state = {
+          ...state,
+          titleScreenVisible: false,
+          panelVisible: true,
+          character: null,
+        };
+        draw();
       }
-    }, 200);
+    }, 1);
   };
 
   const ReturnPrompt = () => {
