@@ -30,7 +30,7 @@ const init = (rootNode) => {
       emoji: '👨‍🌾🚚🆘',
       finalEmoji: '😮👤🏯',
       finalWord: 'ninja',
-      transitions: ['engine', 'engine', 'engin', 'enjin', 'njine', 'ninja', 'ninja'],
+      transitions: ['engine', 'engine', 'engin', 'enjin', 'njine', 'ninja', 'ninja', 'ninja'],
       finalText: '"I can hire a NINJA to deliver the crops and nobody will know it wasn\'t me!"'
     }
     // eclipsed -> lipstick
@@ -169,7 +169,35 @@ const init = (rootNode) => {
       [2950, ()=> {
         character.remove();
         panViewBox(0);
-        strobeTunnel(0);
+        strobeTunnel();
+        const svg = document.querySelector('svg');
+        const startingPosition = 230;
+        effects([
+          [200, () => {
+            svg.appendChild(text(state.character.transitions[0], {'font-size': 12, y: 240, x: startingPosition}))
+          }],
+          [400, () => {
+            svg.appendChild(text(state.character.transitions[1], {'font-size': 12, y: 240, x: startingPosition + 60}))
+          }],
+          [600, () => {
+            svg.appendChild(text(state.character.transitions[2], {'font-size': 12, y: 240, x: startingPosition + 120}))
+          }],
+          [800, () => {
+            svg.appendChild(text(state.character.transitions[3], {'font-size': 12, y: 240, x: startingPosition + 180}))
+          }],
+          [1000, () => {
+            svg.appendChild(text(state.character.transitions[4], {'font-size': 12, y: 240, x: startingPosition + 240}))
+          }],
+          [1200, () => {
+            svg.appendChild(text(state.character.transitions[5], {'font-size': 12, y: 240, x: startingPosition + 300}))
+          }],
+          [1400, () => {
+            svg.appendChild(text(state.character.transitions[6], {'font-size': 12, y: 240, x: startingPosition + 360}))
+          }],
+          [1600, () => {
+            svg.appendChild(text(state.character.transitions[7], {'font-size': 12, y: 240, x: startingPosition + 420}))
+          }],
+        ]);
         effects([
           [500, () => flashLighting('e96214')],
           [600, () => flashLighting('transparent')],
@@ -213,7 +241,7 @@ const init = (rootNode) => {
 
   const restoreCharacter = () => {
     const svg = document.querySelector('svg');
-    let character = text(state.character, {x: 635, y: 265, classList: ['character'], 'font-size': '36px'});
+    let character = text(state.character.characterEmoji, {x: 635, y: 265, classList: ['character'], 'font-size': '36px'});
     svg.appendChild(character);
   };
 
@@ -249,7 +277,7 @@ const init = (rootNode) => {
       state = {
         ...state,
         panelVisible: false,
-        character: item.characterEmoji,
+        character: item,
       };
       draw();
       enterCharacter(0);
@@ -369,7 +397,7 @@ const init = (rootNode) => {
         stroke: '#4e493c',
         'stroke-width': '2',
       }),
-      state.character && text(state.character, {x: -50, y: 265, classList: ['character'], 'font-size': '36px'}),
+      state.character && text(state.character.characterEmoji, {x: -50, y: 265, classList: ['character'], 'font-size': '36px'}),
       rect({classList: ['lighting-effect'], x:-40, y:0, height: 500, width:1500, fill: 'transparent'}),
     ].filter(i => !!i));
   };
