@@ -7,7 +7,8 @@ const init = (rootNode) => {
       initialWord: 'elixir',
       finalWord: 'cyrillic',
       characterEmoji: '🧙‍♂',
-      emoji: '🧙‍♂️⚗️',
+      initialThoughtEmoji: '⚗️📕',
+      finalThoughtEmoji: '',
       transitions: ['elixir', 'elixir', 'elixir', 'xerilic', 'xerilic', 'xerillic', 'cyrillic'],
       finalText: '"Of course! The recipe is in CYRILLIC!"'
     },
@@ -17,8 +18,8 @@ const init = (rootNode) => {
       initialWord: 'pasta',
       finalWord: 'tapas',
       characterEmoji: '👨‍🍳',
-      emoji: '👨‍🍳🍝🇮🇹',
-      finalEmoji: '👨‍🍳🥘🇪🇸',
+      initialThoughtEmoji: '🍝🇮🇹',
+      finalThoughtEmoji: '🥘🇪🇸',
       transitions: ['pasta', 'pasta', 'apast', 'apast', 'apast', 'tapas', 'tapas', 'tapas'],
       finalText: '"I can freshen things up by making lots of tasty TAPAS!"'
 
@@ -27,8 +28,8 @@ const init = (rootNode) => {
       id: 'engine',
       introText: 'a farmer was having trouble with the ENGINE of their car',  // ninja appears to deliver the package.
       characterEmoji: '👨‍🌾',
-      emoji: '👨‍🌾🚚🆘',
-      finalEmoji: '😮👤🏯',
+      initialThoughtEmoji: '🚚🆘',
+      finalThoughtEmoji: '👤🏯',
       finalWord: 'ninja',
       transitions: ['engine', 'engine', 'engin', 'enjin', 'njine', 'ninja', 'ninja', 'ninja'],
       finalText: '"I can hire a NINJA to deliver the crops and nobody will know it wasn\'t me!"'
@@ -90,8 +91,8 @@ const init = (rootNode) => {
     div, p, button
   } = elementBuilders(['div', 'p', 'button']);
   const {
-    svg, circle, ellipse, rect
-  } = svgElementBuilders(['svg', 'circle', 'ellipse', 'rect']);
+    svg, circle, ellipse, rect, g
+  } = svgElementBuilders(['svg', 'circle', 'ellipse', 'rect', 'g']);
 
   const text = (content, opts) => svgElement('text', opts, [document.createTextNode(content)]);
 
@@ -155,9 +156,17 @@ const init = (rootNode) => {
     return [...Array(times).keys()];
   }
 
+  const thoughtBubble = (content) => {
+    state.nodes.stage.appendChild(
+      div({classList: ['thought-bubble']}, [
+        document.createTextNode(content)
+      ])
+    );
+  };
+
   const enterCharacter = () => {
     const character = document.querySelector('.character');
-    effects(repeat(295).map(i=> {
+    effects(repeat(165).map(i=> {
       return [(i+1)*10, ()=> {
         character.setAttribute('x', +character.getAttribute('x') + 1);
         if (i % 30 === 0) {
@@ -165,8 +174,23 @@ const init = (rootNode) => {
         }
       }];
     }));
+
     effects([
-      [2950, ()=> {
+      [1650, () => thoughtBubble(state.character.initialThoughtEmoji)],
+      [4650, () => document.querySelector('.thought-bubble').remove()]
+    ]);
+
+    effects(repeat(130).map(i=> {
+      return [((i+1) * 10) + 5000 , ()=> {
+        character.setAttribute('x', +character.getAttribute('x') + 1);
+        if (i % 30 === 0) {
+          dropDot({x: +character.getAttribute('x') + 1, y: +character.getAttribute('y')})
+        }
+      }];
+    }));
+
+    effects([
+      [8950, ()=> {
         character.remove();
         panViewBox(0);
         strobeTunnel();
@@ -273,7 +297,7 @@ const init = (rootNode) => {
   };
 
   const ItemButton = (item) => {
-    return Button(item.emoji.slice(0, 5), () => {
+    return Button(item.characterEmoji, () => {
       state = {
         ...state,
         panelVisible: false,

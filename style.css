@@ -164,3 +164,12 @@ svg {
   transition: fill .1s ease-in-out;
   opacity: .3;
 }
+
+.thought-bubble {
+  border-radius: 3px;
+  opacity: .3;
+  position: absolute;
+  top: 200px;
+  background-color: var(--dark-neutral);
+  color: var(--light-neutral);
+}
