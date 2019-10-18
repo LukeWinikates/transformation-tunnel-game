@@ -1,4 +1,7 @@
 const init = (rootNode) => {
+  let vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--vh', `${vh}px`);
+
   const items = [
     {
       id: 'elixir',
@@ -96,13 +99,24 @@ const init = (rootNode) => {
 
   const text = (content, opts) => svgElement('text', opts, [document.createTextNode(content)]);
 
+  let positions = {
+    characterEntryPoint: {
+      x: -50,
+      y: 265
+    }
+  };
+
   let state = {
     titleScreenVisible: true,
     panelVisible: false,
-    world: []
+    viewBox: [0,0,0,0],
+    activeStory: null,
+    character: {
+      ...positions.characterEntryPoint
+    },
   };
 
-  const panViewBox = (i) => {
+  const panViewBox = () => {
     const svg = document.querySelector('svg');
     effects(repeat(500).map(i => {
       return [
@@ -165,61 +179,72 @@ const init = (rootNode) => {
   };
 
   const enterCharacter = () => {
-    const character = document.querySelector('.character');
     effects(repeat(165).map(i=> {
       return [(i+1)*10, ()=> {
-        character.setAttribute('x', +character.getAttribute('x') + 1);
-        if (i % 30 === 0) {
-          dropDot({x: +character.getAttribute('x') + 1, y: +character.getAttribute('y')})
-        }
+        let character = state.character;
+        character.x = character.x +1;
+        state = {
+          ...state,
+          character
+        };
+        // if (i % 30 === 0) {
+        //   dropDot({x: +character.getAttribute('x') + 1, y: +character.getAttribute('y')})
+        // }
       }];
     }));
 
     effects([
-      [1650, () => thoughtBubble(state.character.initialThoughtEmoji)],
+      [1650, () => thoughtBubble(state.activeStory.initialThoughtEmoji)],
       [4650, () => document.querySelector('.thought-bubble').remove()]
     ]);
 
     effects(repeat(130).map(i=> {
       return [((i+1) * 10) + 5000 , ()=> {
-        character.setAttribute('x', +character.getAttribute('x') + 1);
-        if (i % 30 === 0) {
-          dropDot({x: +character.getAttribute('x') + 1, y: +character.getAttribute('y')})
-        }
+        let character = state.character;
+        character.x = character.x +1;
+        state = {
+          character,
+          ...state
+        };
+        // if (i % 30 === 0) {
+        //   dropDot({x: +character.getAttribute('x') + 1, y: +character.getAttribute('y')})
+        // }
       }];
     }));
 
     effects([
       [8950, ()=> {
-        character.remove();
+        state = {
+          ...state,
+        };
         panViewBox(0);
         strobeTunnel();
         const svg = document.querySelector('svg');
         const startingPosition = 230;
         effects([
           [200, () => {
-            svg.appendChild(text(state.character.transitions[0], {'font-size': 12, y: 240, x: startingPosition}))
+            svg.appendChild(text(state.activeStory.transitions[0], {'font-size': 12, y: 240, x: startingPosition}))
           }],
           [400, () => {
-            svg.appendChild(text(state.character.transitions[1], {'font-size': 12, y: 240, x: startingPosition + 60}))
+            svg.appendChild(text(state.activeStory.transitions[1], {'font-size': 12, y: 240, x: startingPosition + 60}))
           }],
           [600, () => {
-            svg.appendChild(text(state.character.transitions[2], {'font-size': 12, y: 240, x: startingPosition + 120}))
+            svg.appendChild(text(state.activeStory.transitions[2], {'font-size': 12, y: 240, x: startingPosition + 120}))
           }],
           [800, () => {
-            svg.appendChild(text(state.character.transitions[3], {'font-size': 12, y: 240, x: startingPosition + 180}))
+            svg.appendChild(text(state.activeStory.transitions[3], {'font-size': 12, y: 240, x: startingPosition + 180}))
           }],
           [1000, () => {
-            svg.appendChild(text(state.character.transitions[4], {'font-size': 12, y: 240, x: startingPosition + 240}))
+            svg.appendChild(text(state.activeStory.transitions[4], {'font-size': 12, y: 240, x: startingPosition + 240}))
           }],
           [1200, () => {
-            svg.appendChild(text(state.character.transitions[5], {'font-size': 12, y: 240, x: startingPosition + 300}))
+            svg.appendChild(text(state.activeStory.transitions[5], {'font-size': 12, y: 240, x: startingPosition + 300}))
           }],
           [1400, () => {
-            svg.appendChild(text(state.character.transitions[6], {'font-size': 12, y: 240, x: startingPosition + 360}))
+            svg.appendChild(text(state.activeStory.transitions[6], {'font-size': 12, y: 240, x: startingPosition + 360}))
           }],
           [1600, () => {
-            svg.appendChild(text(state.character.transitions[7], {'font-size': 12, y: 240, x: startingPosition + 420}))
+            svg.appendChild(text(state.activeStory.transitions[7], {'font-size': 12, y: 240, x: startingPosition + 420}))
           }],
         ]);
         effects([
@@ -273,7 +298,7 @@ const init = (rootNode) => {
     return [
       div({id: 'narration', classList: ['fade']}),
       World(),
-      state.titleScreenVisible && Title({visible: state.titleScreenVisible}),
+      Title({visible: state.titleScreenVisible}),
       ButtonPanel({visible: state.panelVisible})
     ].filter(i => !!i);
   };
@@ -301,9 +326,8 @@ const init = (rootNode) => {
       state = {
         ...state,
         panelVisible: false,
-        character: item,
+        activeStory: item,
       };
-      draw();
       enterCharacter(0);
       effects([
         [1500, () => narrationText(item.introText)],
@@ -315,9 +339,9 @@ const init = (rootNode) => {
     });
   };
 
-  const ButtonPanel = ({visible}) => {
+  const ButtonPanel = () => {
     return div({
-      classList: ['button-panel', visible && 'visible'].filter(i => !!i)
+      classList: ['button-panel'].filter(i => !!i)
     }, items.map(ItemButton));
   };
 
@@ -350,8 +374,8 @@ const init = (rootNode) => {
     ]);
   };
 
-  const Title = ({visible}) => {
-    return div({classList: ['title-panel']}, [
+  const Title = () => {
+    return div({classList: ['title-panel', 'visible']}, [
       P('A mysterious portal has opened in a quiet village...'),
       P('when villagers wander in, they think they\'re talking about one thing, but end up saying something else'),
       Button('Start', () => {
@@ -360,7 +384,6 @@ const init = (rootNode) => {
           titleScreenVisible: false,
           panelVisible: true,
         };
-        draw();
       }),
       P('Inspired by the henshin tunnel series by AKIYAMA TADASHI'),
       P('Special thanks to CMU Pronouncing Dictionary, PostgreSQL, Array#rotate')
@@ -390,7 +413,7 @@ const init = (rootNode) => {
   };
 
   const World = () => {
-    return svg({height: "500", width: "500", viewBox: '0 0 300 500'}, [
+    return svg({height: "500", width: "500", viewBox: '50 200 300 400'}, [
       rect({
         classList: ['tunnel'],
         x: 250,
@@ -405,7 +428,7 @@ const init = (rootNode) => {
         classList: ['tunnel'],
         cx: "250",
         cy: "250",
-        ry: "38",
+        ry: "39",
         rx: '15',
         fill: '#e96214',
         stroke: '#4e493c',
@@ -415,13 +438,13 @@ const init = (rootNode) => {
         classList: ['tunnel'],
         cx: "650",
         cy: "250",
-        ry: "38",
+        ry: "39",
         rx: '15',
         fill: '#e96214',
         stroke: '#4e493c',
         'stroke-width': '2',
       }),
-      state.character && text(state.character.characterEmoji, {x: -50, y: 265, classList: ['character'], 'font-size': '36px'}),
+      text('', {x: state.character.x, y: state.character.y, classList: ['character'], 'font-size': '36px'}),
       rect({classList: ['lighting-effect'], x:-40, y:0, height: 500, width:1500, fill: 'transparent'}),
     ].filter(i => !!i));
   };
@@ -431,12 +454,44 @@ const init = (rootNode) => {
     root: rootNode,
   };
 
+  const updateButtonPanel = visible => {
+    let panel = state.nodes.root.querySelector('.button-panel');
+    panel.classList[visible ? 'add' : 'remove']('visible');
+  };
+
+  const updateTitleScreen = visible => {
+    let panel = state.nodes.root.querySelector('.title-panel');
+    panel.classList[!visible ? 'add' : 'remove']('hidden');
+  };
+
+  const updateCharacter = character => {
+    let characterNode = state.nodes.root.querySelector('.character');
+    if(state.activeStory){
+      characterNode.textContent = state.activeStory.characterEmoji;
+    }
+    characterNode.setAttribute('x', character.x);
+    characterNode.setAttribute('y', character.y);
+  };
+
+  const animate = (timestamp) => {
+    state.currentTime = timestamp;
+    state.terminated = state.currentTime > state.clockStart + (60 * 1000);
+    updateButtonPanel(state.panelVisible);
+    updateTitleScreen(state.titleScreenVisible);
+    state.character && updateCharacter(state.character);
+    state.terminated || requestAnimationFrame(animate);
+  };
+
   const draw = () => {
     let nodes = render();
     clear(state.nodes.stage);
     [...nodes].forEach(n => {
       state.nodes.stage.appendChild(n);
-    })
+    });
+    requestAnimationFrame(timeStamp => {
+      state.clockStart = timeStamp;
+      requestAnimationFrame(animate);
+    });
   };
 
   draw();
