@@ -103,13 +103,14 @@ const init = (rootNode) => {
     characterEntryPoint: {
       x: -50,
       y: 265
-    }
+    },
+    initialViewBox: [50, 200, 300, 400]
   };
 
   let state = {
     titleScreenVisible: true,
     panelVisible: false,
-    viewBox: [0,0,0,0],
+    viewBox: positions.initialViewBox,
     activeStory: null,
     character: {
       ...positions.characterEntryPoint
@@ -346,12 +347,13 @@ const init = (rootNode) => {
   };
 
   const scrollViewBoxBack = () => {
-    const svg = document.querySelector('svg');
     setTimeout(() => {
-      let oldViewBox = svg.getAttribute('viewBox');
-      [x, y, w, h] = oldViewBox.split(' ');
-      let newViewBox = [x - 2, y, w, h].join(' ');
-      svg.setAttribute('viewBox', newViewBox);
+      let [x, y, w, h] = state.viewBox;
+      state = {
+        ...state,
+        viewBox: [x -2, y, w, h]
+      };
+
       if (+x > 0) {
         scrollViewBoxBack();
       } else {
@@ -374,6 +376,18 @@ const init = (rootNode) => {
     ]);
   };
 
+  const zoomViewBoxOut = () => {
+    effects(repeat(100).map(i=> {
+      return [i*5, () => {
+        state = {
+          ...state,
+          viewBox: [state.viewBox[0], state.viewBox[1]-1, state.viewBox[2] - 1, state.viewBox[3] + 1]
+        };
+        console.log(state.viewBox);
+      }];
+    }));
+  };
+
   const Title = () => {
     return div({classList: ['title-panel', 'visible']}, [
       P('A mysterious portal has opened in a quiet village...'),
@@ -384,6 +398,7 @@ const init = (rootNode) => {
           titleScreenVisible: false,
           panelVisible: true,
         };
+        zoomViewBoxOut();
       }),
       P('Inspired by the henshin tunnel series by AKIYAMA TADASHI'),
       P('Special thanks to CMU Pronouncing Dictionary, PostgreSQL, Array#rotate')
@@ -412,8 +427,12 @@ const init = (rootNode) => {
     [...node.childNodes].map(e => node.removeChild(e));
   };
 
+  const viewBoxAttribute = (a) => {
+    return a.join(' ');
+  };
+
   const World = () => {
-    return svg({height: "500", width: "500", viewBox: '50 200 300 400'}, [
+    return svg({height: "500", width: "500", viewBox: viewBoxAttribute(state.viewBox)}, [
       rect({
         classList: ['tunnel'],
         x: 250,
@@ -473,11 +492,20 @@ const init = (rootNode) => {
     characterNode.setAttribute('y', character.y);
   };
 
+  const updateViewBox = viewBox => {
+    let svg = state.nodes.root.querySelector('svg');
+    if(viewBox.join(' ') === svg.getAttribute('viewBox')){
+      return;
+    }
+    svg.setAttribute('viewBox', viewBox.join(' '));
+  };
+
   const animate = (timestamp) => {
     state.currentTime = timestamp;
     state.terminated = state.currentTime > state.clockStart + (60 * 1000);
     updateButtonPanel(state.panelVisible);
     updateTitleScreen(state.titleScreenVisible);
+    updateViewBox(state.viewBox);
     state.character && updateCharacter(state.character);
     state.terminated || requestAnimationFrame(animate);
   };
