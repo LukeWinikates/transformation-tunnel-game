@@ -107,6 +107,10 @@ const init = (rootNode) => {
       x: -50,
       y: 265
     },
+    characterPauseLocation: {
+      x: 100,
+      y: 265
+    },
     endOfTunnel: {
       x: 635,
       y: 265
@@ -174,111 +178,38 @@ const init = (rootNode) => {
   }
 
   const scene = (...animations) => {
-    // start all the animations
-    // once the animations end, we'll consider the scene over
-    // such that the start of the next scene is at the end of this one
+  };
+
+  const after = (waitTime, steps) => {
+    return effects(steps.map(([t, f])=> {
+      return [t + waitTime, f]
+    }));
   };
 
   const startScene = () => {
-    state = {
-      ...state,
-      timeline: [
-        scene(
-          effects(repeat(165).map(i=> {
-            return [(i+1)*10, ()=> {
-              let character = state.character;
-              character.x = character.x +1;
-              state = {
-                ...state,
-                character
-              };
-              if (i % 30 === 0) {
-                dropDot({x: character.x + 1, y: character.y})
-              }
-            }];
-          })),
-        effects([
-          [1500, () => narrationText(state.activeStory.introText)],
-          [5000, fadeNarration]
-        ])
-        // zoom out
-        // character enters, then character talks
-        ),
-        scene(
-          effects([
-          [8950, ()=> {
-            state = {
-              ...state,
-            };
-            panViewBox();
-            strobeTunnel();
-            const svg = document.querySelector('svg');
-            const startingPosition = 230;
-            effects([
-              [200, () => {
-                svg.appendChild(text(state.activeStory.transitions[0], {'font-size': 12, y: 240, x: startingPosition}))
-              }],
-              [400, () => {
-                svg.appendChild(text(state.activeStory.transitions[1], {'font-size': 12, y: 240, x: startingPosition + 60}))
-              }],
-              [600, () => {
-                svg.appendChild(text(state.activeStory.transitions[2], {'font-size': 12, y: 240, x: startingPosition + 120}))
-              }],
-              [800, () => {
-                svg.appendChild(text(state.activeStory.transitions[3], {'font-size': 12, y: 240, x: startingPosition + 180}))
-              }],
-              [1000, () => {
-                svg.appendChild(text(state.activeStory.transitions[4], {'font-size': 12, y: 240, x: startingPosition + 240}))
-              }],
-              [1200, () => {
-                svg.appendChild(text(state.activeStory.transitions[5], {'font-size': 12, y: 240, x: startingPosition + 300}))
-              }],
-              [1400, () => {
-                svg.appendChild(text(state.activeStory.transitions[6], {'font-size': 12, y: 240, x: startingPosition + 360}))
-              }],
-              [1600, () => {
-                svg.appendChild(text(state.activeStory.transitions[7], {'font-size': 12, y: 240, x: startingPosition + 420}))
-              }],
-            ]);
-            effects([
-              [500, () => flashLighting('e96214')],
-              [600, () => flashLighting('transparent')],
-              [1000, () => flashLighting('e2ac22')],
-              [1100, () => flashLighting('transparent')],
-              [1500, () => flashLighting('e96214')],
-              [1600, () => flashLighting('transparent')],
-              [2000, () => flashLighting('e2ac22')],
-              [2100, () => flashLighting('transparent')],
-              [2500, () => flashLighting('e96214')],
-              [2600, () => flashLighting('transparent')],
-              // [3000, () => flashLighting('e96214')],
-              // [3100, () => flashLighting('transparent')],
-            ]);
-          }]
-        ])
-        ),
-        scene(
-          effects([
-            [2500, () => {
-              moveCharacterToEndOfTunnel();
-              characterExitTunnel(0);
-            }]
-          ])
-          // emerge from tunnel
-          // pan camera
-          // show some text
-        ),
-        scene(
-          // show button
-        )
-      ]
-    };
+    let moveCharacterIntoScene = effects(repeat(165).map(i => {
+      return [(i + 1) * 10, () => {
+        let character = state.character;
+        character.x = character.x + 1;
+        state = {
+          ...state,
+          character
+        };
+        if (i % 30 === 0) {
+          dropDot({x: character.x + 1, y: character.y})
+        }
+      }];
+    }));
 
+    let showNarration = after(moveCharacterIntoScene, [
+        [0, () => narrationText(state.activeStory.introText)],
+        [3000, fadeNarration]
+    ]);
 
+    console.log(showNarration);
 
-
-    effects(repeat(130).map(i=> {
-      return [((i+1) * 10) + 5000 , ()=> {
+    after(showNarration, repeat(130).map(i=> {
+      return [((i+1) * 10) , ()=> {
         let character = state.character;
         character.x = character.x +1;
         state = {
@@ -291,6 +222,98 @@ const init = (rootNode) => {
       }];
     }));
 
+    // scene(
+    //   effects([
+    //     [8950, () => {
+    //       state = {
+    //         ...state,
+    //       };
+    //       panViewBox();
+    //       strobeTunnel();
+    //       const svg = document.querySelector('svg');
+    //       const startingPosition = 230;
+    //       effects([
+    //         [200, () => {
+    //           svg.appendChild(text(state.activeStory.transitions[0], {'font-size': 12, y: 240, x: startingPosition}))
+    //         }],
+    //         [400, () => {
+    //           svg.appendChild(text(state.activeStory.transitions[1], {
+    //             'font-size': 12,
+    //             y: 240,
+    //             x: startingPosition + 60
+    //           }))
+    //         }],
+    //         [600, () => {
+    //           svg.appendChild(text(state.activeStory.transitions[2], {
+    //             'font-size': 12,
+    //             y: 240,
+    //             x: startingPosition + 120
+    //           }))
+    //         }],
+    //         [800, () => {
+    //           svg.appendChild(text(state.activeStory.transitions[3], {
+    //             'font-size': 12,
+    //             y: 240,
+    //             x: startingPosition + 180
+    //           }))
+    //         }],
+    //         [1000, () => {
+    //           svg.appendChild(text(state.activeStory.transitions[4], {
+    //             'font-size': 12,
+    //             y: 240,
+    //             x: startingPosition + 240
+    //           }))
+    //         }],
+    //         [1200, () => {
+    //           svg.appendChild(text(state.activeStory.transitions[5], {
+    //             'font-size': 12,
+    //             y: 240,
+    //             x: startingPosition + 300
+    //           }))
+    //         }],
+    //         [1400, () => {
+    //           svg.appendChild(text(state.activeStory.transitions[6], {
+    //             'font-size': 12,
+    //             y: 240,
+    //             x: startingPosition + 360
+    //           }))
+    //         }],
+    //         [1600, () => {
+    //           svg.appendChild(text(state.activeStory.transitions[7], {
+    //             'font-size': 12,
+    //             y: 240,
+    //             x: startingPosition + 420
+    //           }))
+    //         }],
+    //       ]);
+    //       effects([
+    //         [500, () => flashLighting('e96214')],
+    //         [600, () => flashLighting('transparent')],
+    //         [1000, () => flashLighting('e2ac22')],
+    //         [1100, () => flashLighting('transparent')],
+    //         [1500, () => flashLighting('e96214')],
+    //         [1600, () => flashLighting('transparent')],
+    //         [2000, () => flashLighting('e2ac22')],
+    //         [2100, () => flashLighting('transparent')],
+    //         [2500, () => flashLighting('e96214')],
+    //         [2600, () => flashLighting('transparent')],
+    //         // [3000, () => flashLighting('e96214')],
+    //         // [3100, () => flashLighting('transparent')],
+    //       ]);
+    //     }]
+    //   ])
+    // );
+    // scene(
+    //   effects([
+    //     [2500, () => {
+    //       moveCharacterToEndOfTunnel();
+    //       characterExitTunnel(0);
+    //     }]
+    //   ])
+    //   // emerge from tunnel
+      // pan camera
+      // show some text
+    // );
   };
 
   const characterExitTunnel = () => {
@@ -353,9 +376,12 @@ const init = (rootNode) => {
   };
 
   const effects = (effectsList) => {
-    effectsList.map(([timing, f]) => {
+    return effectsList.map(([timing, f]) => {
       setTimeout(f, timing);
-    });
+      return {
+        time: timing,
+      }
+    }).reverse()[0].time;
   };
 
   const ItemButton = (item) => {
