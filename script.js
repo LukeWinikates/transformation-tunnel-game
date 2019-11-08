@@ -6,8 +6,8 @@ const init = (rootNode) => {
     {
       id: 'elixir',
       audio: '/audio/elixir.m4a',
-      introText: 'a wizard was trying to decipher a recipe for a mysterious ELIXIR',
-      postIntroText: '"The elixir is the key to it all, but what is this strange writing!?"',
+      introText: 'a wizard had been trying to decipher a mysterious tome',
+      postIntroText: '"I must discover the secret of the ELIXIR!, but what is this strange WRITING!?"',
       initialWord: 'elixir',
       finalWord: 'cyrillic',
       characterEmoji: '🧙‍♂',
@@ -18,8 +18,8 @@ const init = (rootNode) => {
     },
     {
       id: 'pasta',
-      introText: 'a chef had been making PASTA all day',
-      postIntroText: '"I feel like all I make these days is PASTA!"',
+      introText: 'a chef was feeling down about always making the same dishes',
+      postIntroText: '"I just feel like all I make these days is PASTA!"',
       initialWord: 'pasta',
       finalWord: 'tapas',
       characterEmoji: '👨‍🍳',
@@ -137,7 +137,7 @@ const init = (rootNode) => {
   };
 
   const panViewBox = () => {
-    effects(repeat(500).map(i => {
+    effects(repeat(650).map(i => {
       return [
         (i + 1) * 5,
         () => {
@@ -171,7 +171,7 @@ const init = (rootNode) => {
           [...tunnel].forEach(e => {
             e.setAttribute('fill', newColor)
           });
-          flashLighting(newColor)
+          flashLighting(newColor);
         }],
         [base + 100, () => {
           flashLighting('transparent')
@@ -202,7 +202,11 @@ const init = (rootNode) => {
   };
 
   const startScene = () => {
-    let moveCharacterIntoScene = effects(repeat(165).map(i => {
+    let showNarration = effects([
+      [0, () => narrationText(state.activeStory.introText)],
+    ]);
+
+    let moveCharacterIntoScene = after(showNarration + 1500, repeat(165).map(i => {
       return [(i + 1) * 10, () => {
         let character = state.character;
         character.x = character.x + 1;
@@ -216,13 +220,9 @@ const init = (rootNode) => {
       }];
     }));
 
-    let showNarration = after(moveCharacterIntoScene, [
-      [0, () => narrationText(state.activeStory.introText)],
-      [3000, fadeNarration]
-    ]);
+    let hideNarration = after(moveCharacterIntoScene, [[0, fadeNarration]]);
 
-
-    let moveToTunnel = after(showNarration, repeat(130).map(i => {
+    let moveToTunnel = after(hideNarration + 1500, repeat(130).map(i => {
       return [((i + 1) * 10), () => {
         let character = state.character;
         character.x = character.x + 1;
@@ -260,7 +260,7 @@ const init = (rootNode) => {
   };
 
   const characterExitTunnel = () => {
-    let moves = repeat(50).map(i => {
+    let moves = repeat(100).map(i => {
       return [
         (i + 1) * 5,
         () => {
