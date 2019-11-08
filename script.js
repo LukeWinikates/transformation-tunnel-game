@@ -115,7 +115,14 @@ const init = (rootNode) => {
       x: 635,
       y: 265
     },
-    initialViewBox: [50, 200, 300, 400]
+    initialViewBox: [50, 200, 300, 400],
+    wordPositions: repeat(8).map(i => {
+        return {
+          x: 230 + (i * 60),
+          y: 240
+        }
+      }
+    )
   };
 
   let state = {
@@ -123,6 +130,7 @@ const init = (rootNode) => {
     panelVisible: false,
     viewBox: positions.initialViewBox,
     activeStory: null,
+    tunnelFillColor: '#e96214',
     character: {
       ...positions.characterEntryPoint
     },
@@ -152,14 +160,24 @@ const init = (rootNode) => {
   const strobeTunnel = () => {
     const tunnel = document.querySelectorAll('.tunnel');
     effects(repeat(4).map(i => {
+      const base = (i + 1) * 500;
       return [
-        (i+1)*500, () => {
+        [base, () => {
+          const newColor = state.tunnelFillColor === '#e2ac22' ? '#e96214' : '#e2ac22';
+          state = {
+            ...state,
+            tunnelFillColor: newColor
+          };
           [...tunnel].forEach(e => {
-            e.setAttribute('fill', e.getAttribute('fill') === '#e2ac22' ? '#e96214' : '#e2ac22')
-          })
-        }
+            e.setAttribute('fill', newColor)
+          });
+          flashLighting(newColor)
+        }],
+        [base + 100, () => {
+          flashLighting('transparent')
+        }]
       ]
-    }));
+    }).flat());
   };
 
   const dropDot = ({x, y}) => {
@@ -177,11 +195,8 @@ const init = (rootNode) => {
     return [...Array(times).keys()];
   }
 
-  const scene = (...animations) => {
-  };
-
   const after = (waitTime, steps) => {
-    return effects(steps.map(([t, f])=> {
+    return effects(steps.map(([t, f]) => {
       return [t + waitTime, f]
     }));
   };
@@ -202,16 +217,15 @@ const init = (rootNode) => {
     }));
 
     let showNarration = after(moveCharacterIntoScene, [
-        [0, () => narrationText(state.activeStory.introText)],
-        [3000, fadeNarration]
+      [0, () => narrationText(state.activeStory.introText)],
+      [3000, fadeNarration]
     ]);
 
-    console.log(showNarration);
 
-    after(showNarration, repeat(130).map(i=> {
-      return [((i+1) * 10) , ()=> {
+    let moveToTunnel = after(showNarration, repeat(130).map(i => {
+      return [((i + 1) * 10), () => {
         let character = state.character;
-        character.x = character.x +1;
+        character.x = character.x + 1;
         state = {
           character,
           ...state
@@ -222,104 +236,33 @@ const init = (rootNode) => {
       }];
     }));
 
-    // scene(
-    //   effects([
-    //     [8950, () => {
-    //       state = {
-    //         ...state,
-    //       };
-    //       panViewBox();
-    //       strobeTunnel();
-    //       const svg = document.querySelector('svg');
-    //       const startingPosition = 230;
-    //       effects([
-    //         [200, () => {
-    //           svg.appendChild(text(state.activeStory.transitions[0], {'font-size': 12, y: 240, x: startingPosition}))
-    //         }],
-    //         [400, () => {
-    //           svg.appendChild(text(state.activeStory.transitions[1], {
-    //             'font-size': 12,
-    //             y: 240,
-    //             x: startingPosition + 60
-    //           }))
-    //         }],
-    //         [600, () => {
-    //           svg.appendChild(text(state.activeStory.transitions[2], {
-    //             'font-size': 12,
-    //             y: 240,
-    //             x: startingPosition + 120
-    //           }))
-    //         }],
-    //         [800, () => {
-    //           svg.appendChild(text(state.activeStory.transitions[3], {
-    //             'font-size': 12,
-    //             y: 240,
-    //             x: startingPosition + 180
-    //           }))
-    //         }],
-    //         [1000, () => {
-    //           svg.appendChild(text(state.activeStory.transitions[4], {
-    //             'font-size': 12,
-    //             y: 240,
-    //             x: startingPosition + 240
-    //           }))
-    //         }],
-    //         [1200, () => {
-    //           svg.appendChild(text(state.activeStory.transitions[5], {
-    //             'font-size': 12,
-    //             y: 240,
-    //             x: startingPosition + 300
-    //           }))
-    //         }],
-    //         [1400, () => {
-    //           svg.appendChild(text(state.activeStory.transitions[6], {
-    //             'font-size': 12,
-    //             y: 240,
-    //             x: startingPosition + 360
-    //           }))
-    //         }],
-    //         [1600, () => {
-    //           svg.appendChild(text(state.activeStory.transitions[7], {
-    //             'font-size': 12,
-    //             y: 240,
-    //             x: startingPosition + 420
-    //           }))
-    //         }],
-    //       ]);
-    //       effects([
-    //         [500, () => flashLighting('e96214')],
-    //         [600, () => flashLighting('transparent')],
-    //         [1000, () => flashLighting('e2ac22')],
-    //         [1100, () => flashLighting('transparent')],
-    //         [1500, () => flashLighting('e96214')],
-    //         [1600, () => flashLighting('transparent')],
-    //         [2000, () => flashLighting('e2ac22')],
-    //         [2100, () => flashLighting('transparent')],
-    //         [2500, () => flashLighting('e96214')],
-    //         [2600, () => flashLighting('transparent')],
-    //         // [3000, () => flashLighting('e96214')],
-    //         // [3100, () => flashLighting('transparent')],
-    //       ]);
-    //     }]
-    //   ])
-    // );
-    // scene(
-    //   effects([
-    //     [2500, () => {
-    //       moveCharacterToEndOfTunnel();
-    //       characterExitTunnel(0);
-    //     }]
-    //   ])
-    //   // emerge from tunnel
-      // pan camera
-      // show some text
-    // );
+    let panTheTunnelToEnd = after(moveToTunnel, [[0, () => {
+      panViewBox();
+      strobeTunnel();
+    }]]);
+
+    const svg = document.querySelector('svg');
+
+    let showTheStoryTransitions = after(moveToTunnel,
+      repeat(8).map(i => {
+        return [(i + 1) * 200, () => {
+          svg.appendChild(text(state.activeStory.transitions[i], {'font-size': 12, ...positions.wordPositions[i]}));
+        }]
+      })
+    );
+
+    after(panTheTunnelToEnd, [
+      [2500, () => {
+        moveCharacterToEndOfTunnel();
+        characterExitTunnel();
+      }]
+    ]);
   };
 
   const characterExitTunnel = () => {
     let moves = repeat(50).map(i => {
       return [
-        (i+1) *5,
+        (i + 1) * 5,
         () => {
           state = {
             ...state,
@@ -416,7 +359,7 @@ const init = (rootNode) => {
     let [x, y, w, h] = state.viewBox;
     state = {
       ...state,
-      viewBox: [x -2, y, w, h]
+      viewBox: [x - 2, y, w, h]
     };
 
     if (+x > 0) {
@@ -424,7 +367,7 @@ const init = (rootNode) => {
     } else {
       reinitialize();
     }
-};
+  };
 
   const ReturnPrompt = () => {
     return div({classList: ['title-panel']}, [
@@ -435,11 +378,11 @@ const init = (rootNode) => {
   };
 
   const zoomViewBoxOut = () => {
-    effects(repeat(100).map(i=> {
-      return [i*5, () => {
+    effects(repeat(100).map(i => {
+      return [i * 5, () => {
         state = {
           ...state,
-          viewBox: [state.viewBox[0], state.viewBox[1]-1, state.viewBox[2] - 1, state.viewBox[3] + 1]
+          viewBox: [state.viewBox[0], state.viewBox[1] - 1, state.viewBox[2] - 1, state.viewBox[3] + 1]
         };
       }];
     }));
@@ -519,7 +462,7 @@ const init = (rootNode) => {
         'stroke-width': '2',
       }),
       text('', {x: state.character.x, y: state.character.y, classList: ['character'], 'font-size': '36px'}),
-      rect({classList: ['lighting-effect'], x:-40, y:0, height: 500, width:1500, fill: 'transparent'}),
+      rect({classList: ['lighting-effect'], x: -40, y: 0, height: 500, width: 1500, fill: 'transparent'}),
     ].filter(i => !!i));
   };
 
@@ -540,7 +483,7 @@ const init = (rootNode) => {
 
   const updateCharacter = character => {
     let characterNode = state.nodes.root.querySelector('.character');
-    if(state.activeStory){
+    if (state.activeStory) {
       characterNode.textContent = state.activeStory.characterEmoji;
     }
     characterNode.setAttribute('x', character.x);
@@ -549,7 +492,7 @@ const init = (rootNode) => {
 
   const updateViewBox = viewBox => {
     let svg = state.nodes.root.querySelector('svg');
-    if(viewBox.join(' ') === svg.getAttribute('viewBox')){
+    if (viewBox.join(' ') === svg.getAttribute('viewBox')) {
       return;
     }
     svg.setAttribute('viewBox', viewBox.join(' '));
