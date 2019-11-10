@@ -213,6 +213,13 @@ const init = (rootNode) => {
   };
 
   const startScene = () => {
+    state = {
+      ...state,
+      character: {
+        ...positions.characterEntryPoint
+      }
+    };
+
     let showNarration = effects([
       [0, () => narrationText(state.activeStory.introText)],
     ]);
