@@ -112,13 +112,13 @@ const init = (rootNode) => {
       y: 265
     },
     endOfTunnel: {
-      x: 635,
+      x: 1035,
       y: 265
     },
     initialViewBox: [50, 200, 300, 400],
     wordPositions: repeat(8).map(i => {
         return {
-          x: 230 + (i * 60),
+          x: 230 + (i * 120),
           y: 240
         }
       }
@@ -137,7 +137,7 @@ const init = (rootNode) => {
   };
 
   const panViewBox = () => {
-    effects(repeat(650).map(i => {
+    effects(repeat(1050).map(i => {
       return [
         (i + 1) * 5,
         () => {
@@ -159,7 +159,7 @@ const init = (rootNode) => {
 
   const strobeTunnel = () => {
     const tunnel = document.querySelectorAll('.tunnel');
-    effects(repeat(4).map(i => {
+    effects(repeat(8).map(i => {
       const base = (i + 1) * 500;
       return [
         [base, () => {
@@ -242,7 +242,7 @@ const init = (rootNode) => {
       [0, fadeNarration],
       [1000, () => narrationText(state.activeStory.postIntroText)],
       [1500, () => swirlEmojiAroundCharacter(state.activeStory.initialThoughtEmoji)],
-      [6000, fadeNarration]
+      [8000, fadeNarration]
     ]);
 
     let moveToTunnel = after(hideNarrationShowDialogueAndWait + 1500, repeat(145).map(i => {
@@ -268,14 +268,14 @@ const init = (rootNode) => {
 
     let showTheStoryTransitions = after(moveToTunnel,
       repeat(8).map(i => {
-        return [(i + 1) * 200, () => {
+        return [(i + 1) * 400, () => {
           svg.appendChild(text(state.activeStory.transitions[i], {'font-size': 12, ...positions.wordPositions[i]}));
         }]
       })
     );
 
     after(panTheTunnelToEnd, [
-      [2500, () => {
+      [5500, () => {
         moveCharacterToEndOfTunnel();
         characterExitTunnel();
       }]
@@ -463,7 +463,7 @@ const init = (rootNode) => {
         x: 250,
         y: 210,
         height: 80,
-        width: 400,
+        width: 800,
         fill: '#e96214',
       }),
       ellipse({
@@ -478,7 +478,7 @@ const init = (rootNode) => {
       }),
       ellipse({
         classList: ['tunnel'],
-        cx: "650",
+        cx: "1050",
         cy: "250",
         ry: "39",
         rx: '15',
@@ -487,7 +487,7 @@ const init = (rootNode) => {
         'stroke-width': '2',
       }),
       text('', {x: state.character.x, y: state.character.y, classList: ['character'], 'font-size': '36px'}),
-      rect({classList: ['lighting-effect'], x: -40, y: 0, height: 500, width: 1500, fill: 'transparent'}),
+      rect({classList: ['lighting-effect'], x: -40, y: 0, height: 1500, width: 2000, fill: 'transparent'}),
     ].filter(i => !!i));
   };
 
