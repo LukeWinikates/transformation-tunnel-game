@@ -12,7 +12,7 @@ const init = (rootNode) => {
       finalWord: 'cyrillic',
       characterEmoji: '🧙‍♂',
       initialThoughtEmoji: '⚗️📕',
-      finalThoughtEmoji: '',
+      finalThoughtEmoji: 'Да!',
       transitions: ['elixir', 'elixir', 'elikzir', 'zerilic', 'xerilic?', 'xerillic', 'cyrillic', 'cyrillic'],
       finalText: '"Of course! The recipe is in CYRILLIC!"'
     },
@@ -104,7 +104,7 @@ const init = (rootNode) => {
 
   let positions = {
     characterEntryPoint: {
-      x: -50,
+      x: -100,
       y: 265
     },
     characterPauseLocation: {
@@ -142,7 +142,7 @@ const init = (rootNode) => {
         (i + 1) * 5,
         () => {
           [x, y, w, h] = state.viewBox;
-          let newViewBox = [i, y, w, h];
+          let newViewBox = [x + 1, y, w, h];
           state = {
             ...state,
             viewBox: newViewBox
@@ -201,12 +201,23 @@ const init = (rootNode) => {
     }));
   };
 
+  const swirlEmojiAroundCharacter = (thoughtEmoji) => {
+    let svg = document.querySelector('svg');
+    const emojiTextElement = text(thoughtEmoji, {x: state.character.x, y: state.character.y - 40 });
+    svg.appendChild(emojiTextElement);
+    after(4000, [
+      [0, ()=>{
+        svg.removeChild(emojiTextElement)
+      }]
+    ])
+  };
+
   const startScene = () => {
     let showNarration = effects([
       [0, () => narrationText(state.activeStory.introText)],
     ]);
 
-    let moveCharacterIntoScene = after(showNarration + 1500, repeat(165).map(i => {
+    let moveCharacterIntoScene = after(showNarration + 1500, repeat(170).map(i => {
       return [(i + 1) * 10, () => {
         let character = state.character;
         character.x = character.x + 1;
@@ -220,9 +231,14 @@ const init = (rootNode) => {
       }];
     }));
 
-    let hideNarration = after(moveCharacterIntoScene, [[0, fadeNarration]]);
+    let hideNarrationShowDialogueAndWait = after(moveCharacterIntoScene, [
+      [0, fadeNarration],
+      [1000, () => narrationText(state.activeStory.postIntroText)],
+      [1500, () => swirlEmojiAroundCharacter(state.activeStory.initialThoughtEmoji)],
+      [6000, fadeNarration]
+    ]);
 
-    let moveToTunnel = after(hideNarration + 1500, repeat(130).map(i => {
+    let moveToTunnel = after(hideNarrationShowDialogueAndWait + 1500, repeat(145).map(i => {
       return [((i + 1) * 10), () => {
         let character = state.character;
         character.x = character.x + 1;
@@ -279,7 +295,9 @@ const init = (rootNode) => {
     });
     effects([
       ...moves,
-      [250, showReturnButton]
+      [1000, () => narrationText(state.activeStory.finalText)],
+      [1000, ()=> swirlEmojiAroundCharacter(state.activeStory.finalThoughtEmoji)],
+      [5000, showReturnButton]
     ]);
   };
 
