@@ -97,8 +97,8 @@ const init = (rootNode) => {
     div, p, button
   } = elementBuilders(['div', 'p', 'button']);
   const {
-    svg, circle, ellipse, rect, g
-  } = svgElementBuilders(['svg', 'circle', 'ellipse', 'rect', 'g']);
+    svg, circle, ellipse, rect, g, path
+  } = svgElementBuilders(['svg', 'circle', 'ellipse', 'rect', 'g', 'path']);
 
   const text = (content, opts) => svgElement('text', opts, [document.createTextNode(content)]);
 
@@ -181,9 +181,9 @@ const init = (rootNode) => {
   };
 
   const dropDot = ({x, y}) => {
-    let svg = document.querySelector('svg');
+    let dotLayer = document.querySelector('.dot-layer');
     let dot = circle({cx: x, cy: y + 1, r: 3, fill: '#4e493c', classList: ['dropdot']});
-    svg.appendChild(dot);
+    dotLayer.appendChild(dot);
     effects([
       [250, () => dot.setAttribute('r', 2)],
       [500, () => dot.setAttribute('fill', 'transparent')],
@@ -245,7 +245,7 @@ const init = (rootNode) => {
       [8000, fadeNarration]
     ]);
 
-    let moveToTunnel = after(hideNarrationShowDialogueAndWait + 1500, repeat(145).map(i => {
+    let moveToTunnel = after(hideNarrationShowDialogueAndWait + 1500, repeat(345).map(i => {
       return [((i + 1) * 10), () => {
         let character = state.character;
         character.x = character.x + 1;
@@ -458,14 +458,14 @@ const init = (rootNode) => {
 
   const World = () => {
     return svg({height: "500", width: "500", viewBox: viewBoxAttribute(state.viewBox)}, [
-      rect({
-        classList: ['tunnel'],
-        x: 250,
-        y: 210,
-        height: 80,
-        width: 800,
-        fill: '#e96214',
-      }),
+      // rect({
+      //   classList: ['tunnel'],
+      //   x: 250,
+      //   y: 210,
+      //   height: 80,
+      //   width: 800,
+      //   fill: '#e96214',
+      // }),
       ellipse({
         classList: ['tunnel'],
         cx: "250",
@@ -487,6 +487,18 @@ const init = (rootNode) => {
         'stroke-width': '2',
       }),
       text('', {x: state.character.x, y: state.character.y, classList: ['character'], 'font-size': '36px'}),
+      g({classList: ['dot-layer']}),
+      path({
+        classList: ['tunnel'],
+        d: `M 250,211
+            A 15,39 0,0,1 250,289
+            L 1050,289
+            A 15,39 0,0,1 1050,211
+            z`,
+        fill: '#e96214',
+        stroke: '#4e493c',
+        'stroke-width': '2'
+      }),
       rect({classList: ['lighting-effect'], x: -40, y: 0, height: 1500, width: 2000, fill: 'transparent'}),
     ].filter(i => !!i));
   };

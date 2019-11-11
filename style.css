@@ -111,19 +111,6 @@ button:hover {
   position: relative;
 }
 
-
-@keyframes transition-left {
-  from {
-    left: 100%;
-    width: 300%;
-  }
-
-  to {
-    left: -100%;
-    width: 100%;
-  }
-}
-
 .title-panel {
   position: absolute;
   width: 70%;
