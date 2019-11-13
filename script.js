@@ -9,7 +9,6 @@ const init = (rootNode) => {
       introText: 'a wizard had been trying to decipher a mysterious tome',
       postIntroText: '"I must discover the secret of the ELIXIR!, but what is this strange WRITING!?"',
       initialWord: 'elixir',
-      finalWord: 'cyrillic',
       characterEmoji: '🧙‍♂',
       initialThoughtEmoji: '⚗️📕',
       finalThoughtEmoji: 'Да!',
@@ -21,7 +20,6 @@ const init = (rootNode) => {
       introText: 'a chef was feeling down about always making the same dishes',
       postIntroText: '"I just feel like all I make these days is PASTA!"',
       initialWord: 'pasta',
-      finalWord: 'tapas',
       characterEmoji: '👨‍🍳',
       initialThoughtEmoji: '🍝🇮🇹',
       finalThoughtEmoji: '🥘🇪🇸',
@@ -36,11 +34,19 @@ const init = (rootNode) => {
       characterEmoji: '👨‍🌾',
       initialThoughtEmoji: '🚚🆘',
       finalThoughtEmoji: '👤🏯',
-      finalWord: 'ninja',
       transitions: ['engine', 'engine', 'engin', 'enjin', 'njine', 'ninja', 'ninja', 'ninja'],
       finalText: '"I can hire a NINJA to deliver the crops and nobody will know it wasn\'t me!"'
+    },
+    {
+      id: 'lipstick',
+      introText: 'a brand strategist was struggling with a name for a new product line',
+      postIntroText: '"We need something great to capture the spirit of this monochrome LIPSTICK"',
+      characterEmoji: '👩‍💼',
+      initialThoughtEmoji: '💄📊',
+      finalThoughtEmoji: '🌘🖤',
+      transitions: ['lipstick', 'lipstick', 'lipstick', 'icklipst', 'icklipst', 'ecklipsd', 'eclipsed', 'eclipsed'],
+      finalText: '"The matte black is just like when the moon is fully ECLIPSED!"'
     }
-    // eclipsed -> lipstick
   ];
 
   const element = (tag, {classList = [], key, ...rest}, children = []) => {
@@ -458,14 +464,6 @@ const init = (rootNode) => {
 
   const World = () => {
     return svg({height: "500", width: "500", viewBox: viewBoxAttribute(state.viewBox)}, [
-      // rect({
-      //   classList: ['tunnel'],
-      //   x: 250,
-      //   y: 210,
-      //   height: 80,
-      //   width: 800,
-      //   fill: '#e96214',
-      // }),
       ellipse({
         classList: ['tunnel'],
         cx: "250",
