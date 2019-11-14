@@ -117,8 +117,16 @@ const init = (rootNode) => {
       x: 100,
       y: 265
     },
+    tunnelEntrance: {
+      x: 265,
+      y: 265
+    },
     endOfTunnel: {
       x: 1035,
+      y: 265
+    },
+    tunnelExitPauseLocation: {
+      x: 1135,
       y: 265
     },
     initialViewBox: [50, 200, 300, 400],
@@ -145,7 +153,7 @@ const init = (rootNode) => {
   const panViewBox = () => {
     effects(repeat(1050).map(i => {
       return [
-        (i + 1) * 5,
+        (i + 1) * 6,
         () => {
           [x, y, w, h] = state.viewBox;
           let newViewBox = [x + 1, y, w, h];
@@ -209,13 +217,42 @@ const init = (rootNode) => {
 
   const swirlEmojiAroundCharacter = (thoughtEmoji) => {
     let svg = document.querySelector('svg');
-    const emojiTextElement = text(thoughtEmoji, {x: state.character.x, y: state.character.y - 40 });
+    const emojiTextElement = text(thoughtEmoji, {x: state.character.x, y: state.character.y - 40});
     svg.appendChild(emojiTextElement);
     after(4000, [
-      [0, ()=>{
+      [0, () => {
         svg.removeChild(emojiTextElement)
       }]
     ])
+  };
+
+  const moveTo = (f, start, dest, speed) => {
+    let distance = (Math.sqrt(Math.pow(Math.abs(dest.x - start.x), 2) + Math.pow(Math.abs(dest.y - start.y), 2)));
+    let changeX = (dest.x - start.x) / distance;
+    let changeY = (dest.y - start.y) / distance;
+    return repeat(distance).map(i => {
+        const tickCount = i + 1;
+        const animationTime = tickCount * speed;
+        const newX = start.x + (tickCount * changeX);
+        const newY = start.y + (tickCount * changeY);
+        return [animationTime, () => f({
+          x: newX,
+          y: newY,
+          i
+        })
+        ]
+      }
+    );
+  };
+
+  const moveCharacter = ({x, y, i}) => {
+    state = {
+      ...state,
+      character: {x, y}
+    };
+    if (i % 30 === 0) {
+      dropDot({x, y})
+    }
   };
 
   const startScene = () => {
@@ -230,19 +267,9 @@ const init = (rootNode) => {
       [0, () => narrationText(state.activeStory.introText)],
     ]);
 
-    let moveCharacterIntoScene = after(showNarration + 1500, repeat(170).map(i => {
-      return [(i + 1) * 10, () => {
-        let character = state.character;
-        character.x = character.x + 1;
-        state = {
-          ...state,
-          character
-        };
-        if (i % 30 === 0) {
-          dropDot({x: character.x + 1, y: character.y})
-        }
-      }];
-    }));
+    let characterSpeed = 10; // 10px per s
+
+    let moveCharacterIntoScene = after(showNarration + 1500, moveTo(moveCharacter, positions.characterEntryPoint, positions.characterPauseLocation, characterSpeed));
 
     let hideNarrationShowDialogueAndWait = after(moveCharacterIntoScene, [
       [0, fadeNarration],
@@ -251,21 +278,11 @@ const init = (rootNode) => {
       [8000, fadeNarration]
     ]);
 
-    let moveToTunnel = after(hideNarrationShowDialogueAndWait + 1500, repeat(345).map(i => {
-      return [((i + 1) * 10), () => {
-        let character = state.character;
-        character.x = character.x + 1;
-        state = {
-          character,
-          ...state
-        };
-        if (i % 30 === 0) {
-          dropDot({x: character.x, y: character.y});
-        }
-      }];
-    }));
+    let moveToTunnel = after(hideNarrationShowDialogueAndWait + 1500, moveTo(moveCharacter, positions.characterPauseLocation, positions.tunnelEntrance, characterSpeed));
 
-    let panTheTunnelToEnd = after(moveToTunnel, [[0, () => {
+    let characterExitsTunnel = after(moveToTunnel+1000, moveTo(moveCharacter, positions.tunnelEntrance, positions.tunnelExitPauseLocation, characterSpeed));
+
+    let panTheTunnelToEnd = after(moveToTunnel + 1000, [[0, () => {
       panViewBox();
       strobeTunnel();
     }]]);
@@ -274,58 +291,21 @@ const init = (rootNode) => {
 
     let showTheStoryTransitions = after(moveToTunnel,
       repeat(8).map(i => {
-        return [(i + 1) * 400, () => {
+        return [(i + 1) * 500, () => {
           svg.appendChild(text(state.activeStory.transitions[i], {'font-size': 12, ...positions.wordPositions[i]}));
         }]
       })
     );
 
-    after(panTheTunnelToEnd, [
-      [5500, () => {
-        moveCharacterToEndOfTunnel();
-        characterExitTunnel();
-      }]
-    ]);
-  };
-
-  const characterExitTunnel = () => {
-    let moves = repeat(100).map(i => {
-      return [
-        (i + 1) * 5,
-        () => {
-          state = {
-            ...state,
-            character: {
-              ...state.character,
-              x: state.character.x + 1
-            }
-          };
-          if (i % 30 === 0) {
-            dropDot({x: state.character.x, y: state.character.y})
-          }
-        }
-      ]
-    });
-    effects([
-      ...moves,
+    after(characterExitsTunnel, [
       [1000, () => narrationText(state.activeStory.finalText)],
-      [1000, ()=> swirlEmojiAroundCharacter(state.activeStory.finalThoughtEmoji)],
+      [1000, () => swirlEmojiAroundCharacter(state.activeStory.finalThoughtEmoji)],
       [5000, showReturnButton]
     ]);
   };
 
   const showReturnButton = () => {
     state.nodes.stage.appendChild(ReturnPrompt());
-  };
-
-  const moveCharacterToEndOfTunnel = () => {
-    state = {
-      ...state,
-      character: {
-        ...state.character,
-        ...positions.endOfTunnel
-      }
-    };
   };
 
   const render = () => {
