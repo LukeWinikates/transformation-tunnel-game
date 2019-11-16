@@ -132,7 +132,7 @@ const init = (rootNode) => {
     initialViewBox: [50, 200, 300, 400],
     wordPositions: repeat(8).map(i => {
         return {
-          x: 230 + (i * 120),
+          x: 250 + (i * 100),
           y: 240
         }
       }
@@ -173,7 +173,7 @@ const init = (rootNode) => {
 
   const strobeTunnel = () => {
     const tunnel = document.querySelectorAll('.tunnel');
-    effects(repeat(8).map(i => {
+    effects(repeat(10).map(i => {
       const base = (i + 1) * 500;
       return [
         [base, () => {
