@@ -2,6 +2,18 @@ const init = (rootNode) => {
   let vh = window.innerHeight * 0.01;
   document.documentElement.style.setProperty('--vh', `${vh}px`);
 
+  const randomGender = () => {
+    return ['👨', '👩'][Math.floor(Math.random() * 2)];
+  };
+
+  const randomGenderModifier = () => {
+    return ['', '‍♂'][Math.floor(Math.random() * 2)];
+  };
+
+  const randomSkinTone = () => {
+    return ['🏻', '🏼', '🏽', '🏾', '🏿'][Math.floor(Math.random() * 5)];
+  };
+
   const items = [
     {
       id: 'elixir',
@@ -9,7 +21,7 @@ const init = (rootNode) => {
       introText: 'a wizard had been trying to decipher a mysterious formula',
       postIntroText: '"I must discover the secret of the ELIXIR!, but what is this strange writing!?"',
       initialWord: 'elixir',
-      characterEmoji: '🧙🏾',
+      characterEmoji: '🧙'+ randomSkinTone()+ randomGenderModifier(),
       initialThoughtEmoji: '⚗️📕',
       finalThoughtEmoji: 'Да!',
       transitions: ['elixir', 'elixir', 'elikzir', 'zerilic', 'xerilic?', 'xerillic', 'cyrillic', 'cyrillic'],
@@ -20,7 +32,7 @@ const init = (rootNode) => {
       introText: 'a chef was feeling down about always making the same dishes',
       postIntroText: '"I just feel like all I make these days is PASTA!"',
       initialWord: 'pasta',
-      characterEmoji: '👨‍🍳',
+      characterEmoji: randomGender() + randomSkinTone()+ '‍🍳',
       initialThoughtEmoji: '🍝🇮🇹',
       finalThoughtEmoji: '🥘🇪🇸',
       transitions: ['pasta', 'pasta', 'apast', 'apast', 'apast', 'tapas', 'tapas', 'tapas'],
@@ -30,8 +42,8 @@ const init = (rootNode) => {
     {
       id: 'engine',
       introText: 'a farmer was having trouble with their old truck',
-      postIntroText: '"I need to get these veggies to market, but this darn ENGINE! is giving me fits"',
-      characterEmoji: '👨‍🌾',
+      postIntroText: '"I need to get these veggies to market, but this darn ENGINE is giving me fits"',
+      characterEmoji: randomGender() + randomSkinTone() + '‍🌾',
       initialThoughtEmoji: '🚚🆘',
       finalThoughtEmoji: '👤🏯',
       transitions: ['engine', 'engine', 'engin', 'enjin', 'njine', 'ninja', 'ninja', 'ninja'],
@@ -41,7 +53,7 @@ const init = (rootNode) => {
       id: 'lipstick',
       introText: 'a brand strategist was struggling with a name for a new product line',
       postIntroText: '"We need something great to capture the spirit of this monochrome LIPSTICK"',
-      characterEmoji: '👩‍💼',
+      characterEmoji: randomGender() + randomSkinTone() + '‍💼',
       initialThoughtEmoji: '💄📊',
       finalThoughtEmoji: '🌘🖤',
       transitions: ['lipstick', 'lipstick', 'lipstick', 'icklipst', 'icklipst', 'ecklipsd', 'eclipsed', 'eclipsed'],

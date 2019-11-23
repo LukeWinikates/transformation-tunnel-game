@@ -53,8 +53,8 @@ body {
 
 .button-panel {
   position: absolute;
-  width: 100px;
-  left: -120px;
+  width: 120px;
+  left: -140px;
   display: flex;
   flex-direction: column;
   transition: left .3s linear .5s;
@@ -67,6 +67,7 @@ body {
 
 .button-panel button {
   width: calc(100% - 10px);
+  font-size: 32px;
 }
 
 button {
