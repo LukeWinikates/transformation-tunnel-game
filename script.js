@@ -6,10 +6,10 @@ const init = (rootNode) => {
     {
       id: 'elixir',
       audio: '/audio/elixir.m4a',
-      introText: 'a wizard had been trying to decipher a mysterious tome',
-      postIntroText: '"I must discover the secret of the ELIXIR!, but what is this strange WRITING!?"',
+      introText: 'a wizard had been trying to decipher a mysterious formula',
+      postIntroText: '"I must discover the secret of the ELIXIR!, but what is this strange writing!?"',
       initialWord: 'elixir',
-      characterEmoji: '🧙‍♂',
+      characterEmoji: '🧙🏾',
       initialThoughtEmoji: '⚗️📕',
       finalThoughtEmoji: 'Да!',
       transitions: ['elixir', 'elixir', 'elikzir', 'zerilic', 'xerilic?', 'xerillic', 'cyrillic', 'cyrillic'],
@@ -29,8 +29,8 @@ const init = (rootNode) => {
     },
     {
       id: 'engine',
-      introText: 'a farmer was having trouble with the ENGINE of their car',  // ninja appears to deliver the package.
-      postIntroText: '"I need to get these veggies to market, but this darn ENGINE!"',
+      introText: 'a farmer was having trouble with their old truck',
+      postIntroText: '"I need to get these veggies to market, but this darn ENGINE! is giving me fits"',
       characterEmoji: '👨‍🌾',
       initialThoughtEmoji: '🚚🆘',
       finalThoughtEmoji: '👤🏯',
@@ -114,7 +114,7 @@ const init = (rootNode) => {
       y: 265
     },
     characterPauseLocation: {
-      x: 100,
+      x: 140,
       y: 265
     },
     tunnelEntrance: {
@@ -126,10 +126,10 @@ const init = (rootNode) => {
       y: 265
     },
     tunnelExitPauseLocation: {
-      x: 1135,
+      x: 1115,
       y: 265
     },
-    initialViewBox: [50, 200, 300, 400],
+    initialViewBox: [80, 200, 300, 400],
     wordPositions: repeat(8).map(i => {
         return {
           x: 250 + (i * 100),
@@ -151,9 +151,9 @@ const init = (rootNode) => {
   };
 
   const panViewBox = () => {
-    effects(repeat(1050).map(i => {
+    effects(repeat(900).map(i => {
       return [
-        (i + 1) * 6,
+        (i + 1) * 7,
         () => {
           [x, y, w, h] = state.viewBox;
           let newViewBox = [x + 1, y, w, h];
@@ -280,9 +280,9 @@ const init = (rootNode) => {
 
     let moveToTunnel = after(hideNarrationShowDialogueAndWait + 1500, moveTo(moveCharacter, positions.characterPauseLocation, positions.tunnelEntrance, characterSpeed));
 
-    let characterExitsTunnel = after(moveToTunnel+1000, moveTo(moveCharacter, positions.tunnelEntrance, positions.tunnelExitPauseLocation, characterSpeed));
+    let characterExitsTunnel = after(moveToTunnel, moveTo(moveCharacter, positions.tunnelEntrance, positions.tunnelExitPauseLocation, characterSpeed));
 
-    let panTheTunnelToEnd = after(moveToTunnel + 1000, [[0, () => {
+    let panTheTunnelToEnd = after(moveToTunnel-500, [[0, () => {
       panViewBox();
       strobeTunnel();
     }]]);
@@ -443,7 +443,7 @@ const init = (rootNode) => {
   };
 
   const World = () => {
-    return svg({height: "500", width: "500", viewBox: viewBoxAttribute(state.viewBox)}, [
+    return svg({viewBox: viewBoxAttribute(state.viewBox)}, [
       ellipse({
         classList: ['tunnel'],
         cx: "250",

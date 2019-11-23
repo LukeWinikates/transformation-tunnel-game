@@ -123,11 +123,6 @@ button:hover {
   bottom: -100%;
 }
 
-svg {
-  height: 100%;
-  width: 100%;
-}
-
 #narration {
   opacity: 0.5;
   transition: opacity 1s ease-out, color 1.5s ease-out;

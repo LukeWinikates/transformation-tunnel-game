@@ -3,14 +3,13 @@
 [X] show a list of clickable buttons on load
 [X] on click show text
 [X] animated text scrolling/transitions -- timed fadeouts, hanging over the content
-[ ] more dynamic backgrounds
-[ ] an alternative to the tunnel concept?
-[ ] transition after button click
-[ ] show the character stepping out into the world
-[ ] show the character emerging from the tunnel
-[ ] animate the color/appearance of the tunnel as it's in motion
-[ ] make audio recordings, play them
-
+[X] transition after button click
+[X] show the character stepping out into the world
+[X] animate the color/appearance of the tunnel as it's in motion
+[X] show the character emerging from the tunnel
+[X] better framing/making better use of the screen space
+[ ] more interesting display of the "transition words"
+[ ] disable double-clicks
 ---------------
 [ ] do favicon, etc
 [ ] get running on Glitch
