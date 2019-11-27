@@ -21,7 +21,7 @@ const init = (rootNode) => {
       introText: 'a wizard had been trying to decipher a mysterious formula',
       postIntroText: '"I must discover the secret of the ELIXIR!, but what is this strange writing!?"',
       initialWord: 'elixir',
-      characterEmoji: '🧙'+ randomSkinTone()+ randomGenderModifier(),
+      characterEmoji: '🧙' + randomSkinTone() + randomGenderModifier(),
       initialThoughtEmoji: '⚗️📕',
       finalThoughtEmoji: 'Да!',
       transitions: ['elixir', 'elixir', 'elikzir', 'zerilic', 'xerilic?', 'xerillic', 'cyrillic', 'cyrillic'],
@@ -32,7 +32,7 @@ const init = (rootNode) => {
       introText: 'a chef was feeling down about always making the same dishes',
       postIntroText: '"I just feel like all I make these days is PASTA!"',
       initialWord: 'pasta',
-      characterEmoji: randomGender() + randomSkinTone()+ '‍🍳',
+      characterEmoji: randomGender() + randomSkinTone() + '‍🍳',
       initialThoughtEmoji: '🍝🇮🇹',
       finalThoughtEmoji: '🥘🇪🇸',
       transitions: ['pasta', 'pasta', 'apast', 'apast', 'apast', 'tapas', 'tapas', 'tapas'],
@@ -112,8 +112,8 @@ const init = (rootNode) => {
   };
 
   const {
-    div, p, button
-  } = elementBuilders(['div', 'p', 'button']);
+    div, p, button, span
+  } = elementBuilders(['div', 'p', 'button', 'span']);
   const {
     svg, circle, ellipse, rect, g, path
   } = svgElementBuilders(['svg', 'circle', 'ellipse', 'rect', 'g', 'path']);
@@ -275,14 +275,23 @@ const init = (rootNode) => {
       }
     };
 
-    let showNarration = effects([
-      [0, () => narrationText(state.activeStory.introText)],
-    ]);
+
 
     let characterSpeed = 10; // 10px per s
 
+    state.nodes.root.querySelector('#narration').querySelector('button').onclick = () => {
+
+    };
+
+    // step 1
+
+    let showNarration = effects([
+      [0, () => narrationText(state.activeStory.introText)],
+    ]);
     let moveCharacterIntoScene = after(showNarration + 1500, moveTo(moveCharacter, positions.characterEntryPoint, positions.characterPauseLocation, characterSpeed));
 
+
+    // step 2
     let hideNarrationShowDialogueAndWait = after(moveCharacterIntoScene, [
       [0, fadeNarration],
       [1000, () => narrationText(state.activeStory.postIntroText)],
@@ -290,24 +299,29 @@ const init = (rootNode) => {
       [8000, fadeNarration]
     ]);
 
+
+    // step 3
+
     let moveToTunnel = after(hideNarrationShowDialogueAndWait + 1500, moveTo(moveCharacter, positions.characterPauseLocation, positions.tunnelEntrance, characterSpeed));
 
     let characterExitsTunnel = after(moveToTunnel, moveTo(moveCharacter, positions.tunnelEntrance, positions.tunnelExitPauseLocation, characterSpeed));
 
-    let panTheTunnelToEnd = after(moveToTunnel-500, [[0, () => {
+    after(moveToTunnel - 500, [[0, () => {
       panViewBox();
       strobeTunnel();
     }]]);
 
     const svg = document.querySelector('svg');
 
-    let showTheStoryTransitions = after(moveToTunnel,
+    after(moveToTunnel,
       repeat(8).map(i => {
         return [(i + 1) * 500, () => {
           svg.appendChild(text(state.activeStory.transitions[i], {'font-size': 12, ...positions.wordPositions[i]}));
         }]
       })
     );
+
+    // stage 4
 
     after(characterExitsTunnel, [
       [1000, () => narrationText(state.activeStory.finalText)],
@@ -320,9 +334,16 @@ const init = (rootNode) => {
     state.nodes.stage.appendChild(ReturnPrompt());
   };
 
+  function Narration() {
+    return div({id: 'narration', classList: ['fade']}, [
+      span({id: 'narration-text'}),
+      Button('⏩')
+    ]);
+  }
+
   const render = () => {
     return [
-      div({id: 'narration', classList: ['fade']}),
+      Narration(),
       World(),
       Title({visible: state.titleScreenVisible}),
       ButtonPanel({visible: state.panelVisible})
@@ -332,8 +353,8 @@ const init = (rootNode) => {
   const narrationText = (text) => {
     const narration = state.nodes.stage.querySelector('#narration');
     narration.classList.remove('fade');
-    clear(narration);
-    narration.appendChild(document.createTextNode(text));
+    clear(narration.querySelector('#narration-text'));
+    narration.querySelector('#narration-text').appendChild(document.createTextNode(text));
   };
 
   const fadeNarration = () => {
@@ -385,7 +406,7 @@ const init = (rootNode) => {
       viewBox: [x - 2, y, w, h]
     };
 
-    if (+x > 0) {
+    if (+x > 80) {
       scrollViewBoxBack();
     } else {
       reinitialize();
