@@ -160,6 +160,7 @@ const init = (rootNode) => {
     character: {
       ...positions.characterEntryPoint
     },
+    nextStep: () => {}
   };
 
   const panViewBox = () => {
@@ -275,59 +276,55 @@ const init = (rootNode) => {
       }
     };
 
-
-
     let characterSpeed = 10; // 10px per s
 
-    state.nodes.root.querySelector('#narration').querySelector('button').onclick = () => {
-
+    let step1 = () => {
+      let showNarration = effects([
+        [0, () => narrationText(state.activeStory.introText)],
+      ]);
+      after(showNarration + 1500, moveTo(moveCharacter, positions.characterEntryPoint, positions.characterPauseLocation, characterSpeed));
+      state.nextStep = step2;
     };
 
     // step 1
 
-    let showNarration = effects([
-      [0, () => narrationText(state.activeStory.introText)],
-    ]);
-    let moveCharacterIntoScene = after(showNarration + 1500, moveTo(moveCharacter, positions.characterEntryPoint, positions.characterPauseLocation, characterSpeed));
+    let step2 = () => {
+      after(0, [
+        [0, fadeNarration],
+        [1000, () => narrationText(state.activeStory.postIntroText)],
+        [1500, () => swirlEmojiAroundCharacter(state.activeStory.initialThoughtEmoji)]
+      ]);
+      state.nextStep = step3;
+    };
 
+    let step3 = () => {
+      fadeNarration();
+      let moveToTunnel = after(1500, moveTo(moveCharacter, positions.characterPauseLocation, positions.tunnelEntrance, characterSpeed))
+      let characterExitsTunnel = after(moveToTunnel, moveTo(moveCharacter, positions.tunnelEntrance, positions.tunnelExitPauseLocation, characterSpeed));
 
-    // step 2
-    let hideNarrationShowDialogueAndWait = after(moveCharacterIntoScene, [
-      [0, fadeNarration],
-      [1000, () => narrationText(state.activeStory.postIntroText)],
-      [1500, () => swirlEmojiAroundCharacter(state.activeStory.initialThoughtEmoji)],
-      [8000, fadeNarration]
-    ]);
+      after(moveToTunnel - 500, [[0, () => {
+        panViewBox();
+        strobeTunnel();
+      }]]);
 
+      const svg = document.querySelector('svg');
 
-    // step 3
+      after(moveToTunnel,
+        repeat(8).map(i => {
+          return [(i + 1) * 500, () => {
+            svg.appendChild(text(state.activeStory.transitions[i], {'font-size': 12, ...positions.wordPositions[i]}));
+          }]
+        })
+      );
+      after(characterExitsTunnel, [
+        [1000, () => narrationText(state.activeStory.finalText)],
+        [1000, () => swirlEmojiAroundCharacter(state.activeStory.finalThoughtEmoji)],
+        [5000, showReturnButton]
+      ]);
+      state.nextStep = () => {};
+    };
 
-    let moveToTunnel = after(hideNarrationShowDialogueAndWait + 1500, moveTo(moveCharacter, positions.characterPauseLocation, positions.tunnelEntrance, characterSpeed));
-
-    let characterExitsTunnel = after(moveToTunnel, moveTo(moveCharacter, positions.tunnelEntrance, positions.tunnelExitPauseLocation, characterSpeed));
-
-    after(moveToTunnel - 500, [[0, () => {
-      panViewBox();
-      strobeTunnel();
-    }]]);
-
-    const svg = document.querySelector('svg');
-
-    after(moveToTunnel,
-      repeat(8).map(i => {
-        return [(i + 1) * 500, () => {
-          svg.appendChild(text(state.activeStory.transitions[i], {'font-size': 12, ...positions.wordPositions[i]}));
-        }]
-      })
-    );
-
-    // stage 4
-
-    after(characterExitsTunnel, [
-      [1000, () => narrationText(state.activeStory.finalText)],
-      [1000, () => swirlEmojiAroundCharacter(state.activeStory.finalThoughtEmoji)],
-      [5000, showReturnButton]
-    ]);
+    step1();
   };
 
   const showReturnButton = () => {
@@ -337,7 +334,9 @@ const init = (rootNode) => {
   function Narration() {
     return div({id: 'narration', classList: ['fade']}, [
       span({id: 'narration-text'}),
-      Button('⏩')
+      Button('⏩', () => {
+        state.nextStep();
+      })
     ]);
   }
 
