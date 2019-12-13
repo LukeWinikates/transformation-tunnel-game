@@ -22,8 +22,8 @@ const init = (rootNode) => {
       postIntroText: '"I must discover the secret of the ELIXIR!, but what is this strange writing!?"',
       initialWord: 'elixir',
       characterEmoji: '🧙' + randomSkinTone() + randomGenderModifier(),
-      initialThoughtEmoji: '⚗️📕',
-      finalThoughtEmoji: 'Да!',
+      initialThoughtEmoji: ['⚗️', '📕'],
+      finalThoughtEmoji: ["Ого!", 'Вот это да!'],
       transitions: ['elixir', 'elixir', 'elikzir', 'zerilic', 'xerilic?', 'xerillic', 'cyrillic', 'cyrillic'],
       finalText: '"Of course! The recipe is in CYRILLIC!"'
     },
@@ -33,8 +33,8 @@ const init = (rootNode) => {
       postIntroText: '"I just feel like all I make these days is PASTA!"',
       initialWord: 'pasta',
       characterEmoji: randomGender() + randomSkinTone() + '‍🍳',
-      initialThoughtEmoji: '🍝🇮🇹',
-      finalThoughtEmoji: '🥘🇪🇸',
+      initialThoughtEmoji: ['🍝', '🇮🇹'],
+      finalThoughtEmoji: ['🥘', '🇪🇸'],
       transitions: ['pasta', 'pasta', 'apast', 'apast', 'apast', 'tapas', 'tapas', 'tapas'],
       finalText: '"I can freshen things up by making lots of tasty TAPAS!"'
 
@@ -44,8 +44,8 @@ const init = (rootNode) => {
       introText: 'a farmer was having trouble with their old truck',
       postIntroText: '"I need to get these veggies to market, but this darn ENGINE is giving me fits"',
       characterEmoji: randomGender() + randomSkinTone() + '‍🌾',
-      initialThoughtEmoji: '🚚🆘',
-      finalThoughtEmoji: '👤🏯',
+      initialThoughtEmoji: ['🚚', '🆘'],
+      finalThoughtEmoji: ['👤', '🏯'],
       transitions: ['engine', 'engine', 'engin', 'enjin', 'njine', 'ninja', 'ninja', 'ninja'],
       finalText: '"I can hire a NINJA to deliver the crops and nobody will know it wasn\'t me!"'
     },
@@ -54,8 +54,8 @@ const init = (rootNode) => {
       introText: 'a brand strategist was struggling with a name for a new product line',
       postIntroText: '"We need something great to capture the spirit of this monochrome LIPSTICK"',
       characterEmoji: randomGender() + randomSkinTone() + '‍💼',
-      initialThoughtEmoji: '💄📊',
-      finalThoughtEmoji: '🌘🖤',
+      initialThoughtEmoji: ['💄', '📊'],
+      finalThoughtEmoji: ['🌘', '🖤'],
       transitions: ['lipstick', 'lipstick', 'lipstick', 'icklipst', 'icklipst', 'ecklipsd', 'eclipsed', 'eclipsed'],
       finalText: '"The matte black is just like when the moon is fully ECLIPSED!"'
     }
@@ -157,6 +157,7 @@ const init = (rootNode) => {
     viewBox: positions.initialViewBox,
     activeStory: null,
     tunnelFillColor: '#e96214',
+    narrationButtonVisible: false,
     character: {
       ...positions.characterEntryPoint
     },
@@ -222,21 +223,41 @@ const init = (rootNode) => {
     return [...Array(times).keys()];
   }
 
-  const after = (waitTime, steps) => {
+  const after = (waitTime, steps, done = () => {}) => {
     return effects(steps.map(([t, f]) => {
       return [t + waitTime, f]
-    }));
+    }), done);
+  };
+
+  const dropEmoji = (emoji) => {
+    let dotLayer = document.querySelector('.dot-layer');
+    let emojiElement = text(emoji, {x: state.character.x + 10, y: state.character.y - 40});
+    dotLayer.appendChild(emojiElement);
+    effects([
+      [500, () => emojiElement.setAttribute('color', 'transparent')],
+      [1000, () => emojiElement.remove()],
+    ]);
   };
 
   const swirlEmojiAroundCharacter = (thoughtEmoji) => {
-    let svg = document.querySelector('svg');
-    const emojiTextElement = text(thoughtEmoji, {x: state.character.x, y: state.character.y - 40});
-    svg.appendChild(emojiTextElement);
-    after(4000, [
-      [0, () => {
-        svg.removeChild(emojiTextElement)
-      }]
-    ])
+    effects([
+      [0, () => dropEmoji(thoughtEmoji[0])],
+      [2000, () => dropEmoji(thoughtEmoji[1])]
+    ]);
+  };
+
+  const showNarrationButton = () => {
+    state = {
+      ...state,
+      narrationButtonVisible: true
+    }
+  };
+
+  const hideNarrationButton = () => {
+    state = {
+      ...state,
+      narrationButtonVisible: false
+    }
   };
 
   const moveTo = (f, start, dest, speed) => {
@@ -279,25 +300,28 @@ const init = (rootNode) => {
     let characterSpeed = 10; // 10px per s
 
     let step1 = () => {
+      hideNarrationButton();
       let showNarration = effects([
         [0, () => narrationText(state.activeStory.introText)],
       ]);
-      after(showNarration + 1500, moveTo(moveCharacter, positions.characterEntryPoint, positions.characterPauseLocation, characterSpeed));
+      after(showNarration + 1500, moveTo(moveCharacter, positions.characterEntryPoint, positions.characterPauseLocation, characterSpeed), showNarrationButton);
       state.nextStep = step2;
     };
 
     // step 1
 
     let step2 = () => {
+      hideNarrationButton();
       after(0, [
         [0, fadeNarration],
         [1000, () => narrationText(state.activeStory.postIntroText)],
         [1500, () => swirlEmojiAroundCharacter(state.activeStory.initialThoughtEmoji)]
-      ]);
+      ], showNarrationButton);
       state.nextStep = step3;
     };
 
     let step3 = () => {
+      hideNarrationButton();
       fadeNarration();
       let moveToTunnel = after(1500, moveTo(moveCharacter, positions.characterPauseLocation, positions.tunnelEntrance, characterSpeed))
       let characterExitsTunnel = after(moveToTunnel, moveTo(moveCharacter, positions.tunnelEntrance, positions.tunnelExitPauseLocation, characterSpeed));
@@ -320,7 +344,7 @@ const init = (rootNode) => {
         [1000, () => narrationText(state.activeStory.finalText)],
         [1000, () => swirlEmojiAroundCharacter(state.activeStory.finalThoughtEmoji)],
         [5000, showReturnButton]
-      ]);
+      ], showNarrationButton);
       state.nextStep = () => {};
     };
 
@@ -334,9 +358,9 @@ const init = (rootNode) => {
   function Narration() {
     return div({id: 'narration', classList: ['fade']}, [
       span({id: 'narration-text'}),
-      Button('⏩', () => {
+      Button('next...', () => {
         state.nextStep();
-      })
+      }, { classList: ['narration-button'] })
     ]);
   }
 
@@ -361,8 +385,9 @@ const init = (rootNode) => {
     narration.classList.add('fade');
   };
 
-  const effects = (effectsList) => {
-    return effectsList.map(([timing, f]) => {
+  const effects = (effectsList, done = () => {}) => {
+    let last = effectsList.reverse()[0];
+    return [...effectsList, [last[0], done]].map(([timing, f]) => {
       setTimeout(f, timing);
       return {
         time: timing,
@@ -460,8 +485,8 @@ const init = (rootNode) => {
     return (p({}, [document.createTextNode(text)]));
   };
 
-  const Button = (text, onClick) => {
-    let b = button({}, [document.createTextNode(text)]);
+  const Button = (text, onClick, options = {}) => {
+    let b = button(options, [document.createTextNode(text)]);
     b.onclick = onClick;
     return b;
   };
@@ -537,6 +562,10 @@ const init = (rootNode) => {
     characterNode.setAttribute('y', character.y);
   };
 
+  const updateNarrationButton = visible => {
+    state.nodes.root.querySelector('.narration-button').classList[visible ? 'add' : 'remove']('visible');
+  };
+
   const updateViewBox = viewBox => {
     let svg = state.nodes.root.querySelector('svg');
     if (viewBox.join(' ') === svg.getAttribute('viewBox')) {
@@ -551,6 +580,7 @@ const init = (rootNode) => {
     updateButtonPanel(state.panelVisible);
     updateTitleScreen(state.titleScreenVisible);
     updateViewBox(state.viewBox);
+    updateNarrationButton(state.narrationButtonVisible);
     state.character && updateCharacter(state.character);
     state.terminated || requestAnimationFrame(animate);
   };

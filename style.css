@@ -128,25 +128,41 @@ button:hover {
   transition: opacity 1s ease-out, color 1.5s ease-out;
   position: absolute;
   margin: 20px;
-  background-color: var(--light-neutral);
   width: calc(100% - 40px);
   display: flex;
   align-items: end;
-  flex-direction: row;
+  flex-direction: column;
   text-align: left;
+}
+
+#narration-text {
+  width: 100%;
+  background-color: var(--light-neutral);
+  padding: 10px;
   box-shadow: 2px 1px 2px var(--dark-neutral);
   border: 1px solid var(--dark-neutral);
 }
 
-#narration-text {
+.narration-button {
+  opacity: 0;
+  background-color: var(--tinge-neutral);
+  text-decoration: dotted;
+  width: 50%;
   padding: 10px;
+  margin-left: 0;
+  margin-right: 0;
+  border-radius: 0;
+  transition: background-color .3s ease-out, opacity .3s ease-out;
+  box-shadow: 2px 1px 2px var(--dark-neutral);
+  border: 1px solid var(--dark-neutral);
 }
 
-#narration button {
-  background-color: transparent;
-  border: none;
-  padding-bottom: 0;
-  margin-bottom: 0;
+.narration-button.visible {
+  opacity: 1;
+}
+
+.narration-button:hover {
+  background-color: var(--yellow);
 }
 
 #narration.fade {
