@@ -182,3 +182,25 @@ button:hover {
   transition: fill .1s ease-in-out;
   opacity: .3;
 }
+
+.top-text, .lower-text {
+  position: absolute;
+  width: 100%;
+  height: 150px;
+  font-size: 32px;
+  font-family: 'Andale Mono', 'Monaco', 'sans-serif';
+  color: var(--sea-blue);
+  padding: 5px;
+}
+
+.top-text {
+  top: 130px;
+}
+
+.lower-text {
+  top: 430px;
+}
+
+.top-text span:last-of-type .lower-text span:last-of-type {
+  font-weight: 900;
+}

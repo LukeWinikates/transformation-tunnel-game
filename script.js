@@ -24,7 +24,7 @@ const init = (rootNode) => {
       characterEmoji: '🧙' + randomSkinTone() + randomGenderModifier(),
       initialThoughtEmoji: ['⚗️', '📕'],
       finalThoughtEmoji: ["Ого!", 'Вот это да!'],
-      transitions: ['elixir', 'elixir', 'elikzir', 'zerilic', 'xerilic?', 'xerillic', 'cyrillic', 'cyrillic'],
+      transitions: ['elixir', 'elixir', 'eliXIR', 'ELIXir', 'eliXIR', 'YLLIC', 'CYRILLIC', 'CYRILLIC!?'],
       finalText: '"Of course! The recipe is in CYRILLIC!"'
     },
     {
@@ -35,7 +35,7 @@ const init = (rootNode) => {
       characterEmoji: randomGender() + randomSkinTone() + '‍🍳',
       initialThoughtEmoji: ['🍝', '🇮🇹'],
       finalThoughtEmoji: ['🥘', '🇪🇸'],
-      transitions: ['pasta', 'pasta', 'apast', 'apast', 'apast', 'tapas', 'tapas', 'tapas'],
+      transitions: ['pasta ', 'pasta', 'pasTA', 'PASta', 'pasTA', 'PAS', 'TAPAS', 'tapas!', 'tapas!'],
       finalText: '"I can freshen things up by making lots of tasty TAPAS!"'
 
     },
@@ -46,7 +46,7 @@ const init = (rootNode) => {
       characterEmoji: randomGender() + randomSkinTone() + '‍🌾',
       initialThoughtEmoji: ['🚚', '🆘'],
       finalThoughtEmoji: ['👤', '🏯'],
-      transitions: ['engine', 'engine', 'engin', 'enjin', 'njine', 'ninja', 'ninja', 'ninja'],
+      transitions: ['engine', 'enGIN', 'ENgiNE', 'NG', 'INE', 'NINJA!', 'NINJA!'],
       finalText: '"I can hire a NINJA to deliver the crops and nobody will know it wasn\'t me!"'
     },
     {
@@ -56,7 +56,7 @@ const init = (rootNode) => {
       characterEmoji: randomGender() + randomSkinTone() + '‍💼',
       initialThoughtEmoji: ['💄', '📊'],
       finalThoughtEmoji: ['🌘', '🖤'],
-      transitions: ['lipstick', 'lipstick', 'lipstick', 'icklipst', 'icklipst', 'ecklipsd', 'eclipsed', 'eclipsed'],
+      transitions: ['lipstick ', 'LIPstick ', 'LIPSEDe', 'CLIPSEd', 'ECLIPSED ', 'ECLIPSED ', 'ECLIPSED ', 'ECLIPSED '],
       finalText: '"The matte black is just like when the moon is fully ECLIPSED!"'
     }
   ];
@@ -112,8 +112,8 @@ const init = (rootNode) => {
   };
 
   const {
-    div, p, button, span
-  } = elementBuilders(['div', 'p', 'button', 'span']);
+    div, p, button, span, br
+  } = elementBuilders(['div', 'p', 'button', 'span', 'br']);
   const {
     svg, circle, ellipse, rect, g, path
   } = svgElementBuilders(['svg', 'circle', 'ellipse', 'rect', 'g', 'path']);
@@ -141,14 +141,7 @@ const init = (rootNode) => {
       x: 1115,
       y: 265
     },
-    initialViewBox: [80, 200, 300, 400],
-    wordPositions: repeat(8).map(i => {
-        return {
-          x: 250 + (i * 100),
-          y: 240
-        }
-      }
-    )
+    initialViewBox: [80, 200, 300, 400]
   };
 
   let state = {
@@ -323,7 +316,7 @@ const init = (rootNode) => {
     let step3 = () => {
       hideNarrationButton();
       fadeNarration();
-      let moveToTunnel = after(1500, moveTo(moveCharacter, positions.characterPauseLocation, positions.tunnelEntrance, characterSpeed))
+      let moveToTunnel = after(1500, moveTo(moveCharacter, positions.characterPauseLocation, positions.tunnelEntrance, characterSpeed));
       let characterExitsTunnel = after(moveToTunnel, moveTo(moveCharacter, positions.tunnelEntrance, positions.tunnelExitPauseLocation, characterSpeed));
 
       after(moveToTunnel - 500, [[0, () => {
@@ -331,15 +324,48 @@ const init = (rootNode) => {
         strobeTunnel();
       }]]);
 
-      const svg = document.querySelector('svg');
-
+      const topText = state.nodes.root.querySelector('.top-text');
+      const lowerText = state.nodes.root.querySelector('.lower-text');
       after(moveToTunnel,
         repeat(8).map(i => {
           return [(i + 1) * 500, () => {
-            svg.appendChild(text(state.activeStory.transitions[i], {'font-size': 12, ...positions.wordPositions[i]}));
+            let target = i < 4 ? topText : lowerText;
+            if(i === 2 || i === 7) {
+              target.appendChild(br({}));
+            }
+            target.appendChild(document.createTextNode(state.activeStory.transitions[i]));
           }]
         })
       );
+          // [500, () => {
+          //   topText.appendChild(span({}, [document.createTextNode(state.activeStory.transitions[i])]))
+          // }],
+          // [1000, () => {
+          //   topText.appendChild(span({}, [document.createTextNode('LIPstick ')]))
+          // }],
+          // [1500, () => {
+          //   topText.appendChild(br({}));
+          //   topText.appendChild(span({}, [document.createTextNode('LIPSEDe')]))
+          // }],
+          // [2000, () => {
+          //   topText.appendChild(span({}, [document.createTextNode('CLIPSEd')]))
+          // }],
+          // [2500, () => {
+          //   lowerText.appendChild(span({}, [document.createTextNode('ECLIPSED ')]))
+          // }],
+          // [3000, () => {
+          //   lowerText.appendChild(span({}, [document.createTextNode('ECLIPSED ')]))
+          // }],
+          // [3500, () => {
+          //   lowerText.appendChild(br({}));
+          //   lowerText.appendChild(span({}, [document.createTextNode('ECLIPSED ')]))
+          // }],
+          // [4000, () => {
+          //   lowerText.appendChild(span({}, [document.createTextNode('ECLIPSED ')]))
+          // }],
+        // ]
+      // );
+
       after(characterExitsTunnel, [
         [1000, () => narrationText(state.activeStory.finalText)],
         [1000, () => swirlEmojiAroundCharacter(state.activeStory.finalThoughtEmoji)],
@@ -364,10 +390,20 @@ const init = (rootNode) => {
     ]);
   }
 
+  function TopText() {
+    return div({classList: ['top-text']});
+  }
+
+  function LowerText() {
+    return div({classList: ['lower-text']});
+  }
+
   const render = () => {
     return [
       Narration(),
+      TopText(),
       World(),
+      LowerText(),
       Title({visible: state.titleScreenVisible}),
       ButtonPanel({visible: state.panelVisible})
     ];
