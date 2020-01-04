@@ -2,66 +2,68 @@ const init = (rootNode) => {
   let vh = window.innerHeight * 0.01;
   document.documentElement.style.setProperty('--vh', `${vh}px`);
 
-  const randomGender = () => {
-    return ['👨', '👩'][Math.floor(Math.random() * 2)];
-  };
+  const items = (() => {
+    const randomGender = () => {
+      return ['👨', '👩'][Math.floor(Math.random() * 2)];
+    };
 
-  const randomGenderModifier = () => {
-    return ['', '‍♂'][Math.floor(Math.random() * 2)];
-  };
+    const randomGenderModifier = () => {
+      return ['', '‍♂'][Math.floor(Math.random() * 2)];
+    };
 
-  const randomSkinTone = () => {
-    return ['🏻', '🏼', '🏽', '🏾', '🏿'][Math.floor(Math.random() * 5)];
-  };
+    const randomSkinTone = () => {
+      return ['🏻', '🏼', '🏽', '🏾', '🏿'][Math.floor(Math.random() * 5)];
+    };
 
-  const items = [
-    {
-      id: 'elixir',
-      audio: '/audio/elixir.m4a',
-      introText: 'a wizard had been trying to decipher a mysterious formula',
-      postIntroText: '"I must discover the secret of the ELIXIR!, but I can\'t make heads or tails of this strange writing"',
-      initialWord: 'elixir',
-      characterEmoji: '🧙' + randomSkinTone() + randomGenderModifier(),
-      initialThoughtEmoji: ['⚗️', '📕'],
-      finalThoughtEmoji: ["Ого!", 'Вот это да!'],
-      transitions: ['elixir', 'elixir', 'eliXIR', 'ELIXir', 'eliXIR', 'YLLIC', 'CYRILLIC', 'CYRILLIC!?'],
-      finalText: '"Of course! The recipe is in CYRILLIC!"'
-    },
-    {
-      id: 'pasta',
-      introText: 'a chef was feeling down about always making the same dishes',
-      postIntroText: '"I just feel like all I make these days is PASTA!"',
-      initialWord: 'pasta',
-      characterEmoji: randomGender() + randomSkinTone() + '‍🍳',
-      initialThoughtEmoji: ['🍝', '🇮🇹'],
-      finalThoughtEmoji: ['🥘', '🇪🇸'],
-      transitions: ['pasta ', 'pasta', 'pasTA', 'PASta', 'pasTA', 'PAS ', 'TAPAS ', 'tapas! ', 'tapas!'],
-      finalText: '"I can freshen things up by making lots of tasty TAPAS!"'
+    return [
+      {
+        id: 'elixir',
+        audio: '/audio/elixir.m4a',
+        introText: 'a wizard had been trying to decipher a mysterious formula',
+        postIntroText: '"I must discover the secret of the ELIXIR!, but I can\'t make heads or tails of this strange writing"',
+        initialWord: 'elixir',
+        characterEmoji: '🧙' + randomSkinTone() + randomGenderModifier(),
+        initialThoughtEmoji: ['⚗️', '📕'],
+        finalThoughtEmoji: ["Ого!", 'Вот это да!'],
+        transitions: ['elixir', 'elixir', 'eliXIR', 'ELIXir', 'eliXIR', 'YLLIC', 'CYRILLIC', 'CYRILLIC!?'],
+        finalText: '"Of course! The recipe is in CYRILLIC!"'
+      },
+      {
+        id: 'pasta',
+        introText: 'a chef was feeling down about always making the same dishes',
+        postIntroText: '"I just feel like all I make these days is PASTA!"',
+        initialWord: 'pasta',
+        characterEmoji: randomGender() + randomSkinTone() + '‍🍳',
+        initialThoughtEmoji: ['🍝', '🇮🇹'],
+        finalThoughtEmoji: ['🥘', '🇪🇸'],
+        transitions: ['pasta ', 'pasta', 'pasTA', 'PASta', 'pasTA', 'PAS ', 'TAPAS ', 'tapas! ', 'tapas!'],
+        finalText: '"I can freshen things up by making lots of tasty TAPAS!"'
 
-    },
-    {
-      id: 'engine',
-      introText: 'a farmer was having trouble with their old truck',
-      postIntroText: '"I need to get these veggies to market, but this darn ENGINE is giving me fits"',
-      characterEmoji: randomGender() + randomSkinTone() + '‍🌾',
-      initialThoughtEmoji: ['🚚', '🆘'],
-      finalThoughtEmoji: ['👤', '🏯'],
-      transitions: ['engine', 'enGIN', 'ENgiNE', 'NG', 'INE', 'NINJA!', 'NINJA!'],
-      finalText: '"I can hire a NINJA to deliver the crops and nobody will know it wasn\'t me!"'
-    },
-    {
-      id: 'lipstick',
-      introText: 'a brand strategist was struggling with a name for a new product line',
-      postIntroText: '"We need something great to capture the spirit of this monochrome LIPSTICK"',
-      characterEmoji: randomGender() + randomSkinTone() + '‍💼',
-      initialThoughtEmoji: ['💄', '📊'],
-      finalThoughtEmoji: ['🌘', '🖤'],
-      transitions: ['lipstick ', 'LIPstick ', 'LIPSEDe', 'CLIPSEd', 'ECLIPSED ', 'ECLIPSED ', 'ECLIPSED ', 'ECLIPSED '],
-      finalText: '"The matte black is just like when the moon is fully ECLIPSED!"'
-    }
-  ];
+      },
+      {
+        id: 'engine',
+        introText: 'a farmer was having trouble with their old truck',
+        postIntroText: '"I need to get these veggies to market, but this darn ENGINE is giving me fits"',
+        characterEmoji: randomGender() + randomSkinTone() + '‍🌾',
+        initialThoughtEmoji: ['🚚', '🆘'],
+        finalThoughtEmoji: ['👤', '🏯'],
+        transitions: ['engine', 'enGIN', 'ENgiNE', 'NG', 'INE', 'NINJA!', 'NINJA!'],
+        finalText: '"I can hire a NINJA to deliver the crops and nobody will know it wasn\'t me!"'
+      },
+      {
+        id: 'lipstick',
+        introText: 'a brand strategist was struggling with a name for a new product line',
+        postIntroText: '"We need something great to capture the spirit of this monochrome LIPSTICK"',
+        characterEmoji: randomGender() + randomSkinTone() + '‍💼',
+        initialThoughtEmoji: ['💄', '📊'],
+        finalThoughtEmoji: ['🌘', '🖤'],
+        transitions: ['lipstick ', 'LIPstick ', 'LIPSEDe', 'CLIPSEd', 'ECLIPSED ', 'ECLIPSED ', 'ECLIPSED ', 'ECLIPSED '],
+        finalText: '"The matte black is just like when the moon is fully ECLIPSED!"'
+      }
+    ]
+  })();
 
-  const domElements = (() =>{
+  const domElements = (() => {
     const elementBuilders = (tagNames) => {
       return tagNames.reduce((acc, tagName) => {
         return {
@@ -160,7 +162,12 @@ const init = (rootNode) => {
     character: {
       ...positions.characterEntryPoint
     },
-    nextStep: () => {}
+    nextStep: () => {
+    },
+    nodes: {
+      stage: rootNode.querySelector('#stage'),
+      root: rootNode,
+    }
   };
 
   const panViewBox = () => {
@@ -222,7 +229,8 @@ const init = (rootNode) => {
     return [...Array(times).keys()];
   }
 
-  const after = (waitTime, steps, done = () => {}) => {
+  const after = (waitTime, steps, done = () => {
+  }) => {
     return effects(steps.map(([t, f]) => {
       return [t + waitTime, f]
     }), done);
@@ -336,7 +344,7 @@ const init = (rootNode) => {
         repeat(8).map(i => {
           return [(i + 1) * 500, () => {
             let target = i < 4 ? topText : lowerText;
-            if(i === 2 || i === 7) {
+            if (i === 2 || i === 7) {
               target.appendChild(domElements.br({}));
             }
             target.appendChild(document.createTextNode(state.activeStory.transitions[i]));
@@ -347,7 +355,8 @@ const init = (rootNode) => {
       after(characterExitsTunnel, [
         [1000, () => narrationText(state.activeStory.finalText)],
         [1000, () => swirlEmojiAroundCharacter(state.activeStory.finalThoughtEmoji)],
-        [5000, () =>{}]
+        [5000, () => {
+        }]
       ], showNarrationButton);
       state.nextStep = scrollViewBoxBack;
     };
@@ -355,33 +364,150 @@ const init = (rootNode) => {
     step1();
   };
 
-  function Narration() {
-    return domElements.div({id: 'narration', classList: ['fade']}, [
-      domElements.span({id: 'narration-text'}),
-      Button('next...', () => {
-        state.nextStep();
-      }, { classList: ['narration-button'] })
-    ]);
-  }
+  const render = (() => {
+    function Narration() {
+      return domElements.div({id: 'narration', classList: ['fade']}, [
+        domElements.span({id: 'narration-text'}),
+        Button('next...', () => {
+          state.nextStep();
+        }, {classList: ['narration-button']})
+      ]);
+    }
 
-  function TopText() {
-    return domElements.div({classList: ['top-text']});
-  }
+    function TopText() {
+      return domElements.div({classList: ['top-text']});
+    }
 
-  function LowerText() {
-    return domElements.div({classList: ['lower-text']});
-  }
+    function LowerText() {
+      return domElements.div({classList: ['lower-text']});
+    }
 
-  const render = () => {
-    return [
-      Narration(),
-      TopText(),
-      World(),
-      LowerText(),
-      Title({visible: state.titleScreenVisible}),
-      ButtonPanel({visible: state.panelVisible})
-    ];
-  };
+    const ItemButton = (item) => {
+      return Button(item.characterEmoji, () => {
+        state = {
+          ...state,
+          panelVisible: false,
+          activeStory: item,
+        };
+        startScene();
+      });
+    };
+
+    const ButtonPanel = () => {
+      return domElements.div({
+        classList: ['button-panel'].filter(i => !!i)
+      }, items.map(ItemButton));
+    };
+
+    const Title = () => {
+      return domElements.div({classList: ['title-panel', 'visible']}, [
+        P('A mysterious portal has opened in a quiet village...'),
+        P('when villagers wander in, they think they\'re talking about one thing, but end up saying something else'),
+        Button('Start', () => {
+          state = {
+            ...state,
+            titleScreenVisible: false,
+            panelVisible: true,
+          };
+          zoomViewBoxOut();
+        }),
+        P('Inspired by the henshin tunnel series by AKIYAMA TADASHI'),
+        P('Special thanks to CMU Pronouncing Dictionary, PostgreSQL, Array#rotate, and to my son\'s バーバ  for the play mat that inspired the color palette')
+      ]);
+    };
+
+    const Audio = (url) => {
+      let node = document.createElement('audio');
+      node.src = url;
+      node.controls = false;
+      node.autoplay = true;
+      return node;
+    };
+
+    const P = (text) => {
+      return (domElements.p({}, [document.createTextNode(text)]));
+    };
+
+    const Button = (text, onClick, options = {}) => {
+      let b = domElements.button(options, [document.createTextNode(text)]);
+      b.onclick = onClick;
+      return b;
+    };
+
+    const World = () => {
+      return domElements.svg({viewBox: viewBoxAttribute(state.viewBox)}, [
+        domElements.ellipse({
+          classList: ['tunnel'],
+          cx: "250",
+          cy: "250",
+          ry: "39",
+          rx: '15',
+          fill: '#e96214',
+          stroke: '#4e493c',
+          'stroke-width': '2',
+        }),
+        domElements.ellipse({
+          classList: ['tunnel'],
+          cx: "1050",
+          cy: "250",
+          ry: "39",
+          rx: '15',
+          fill: '#e96214',
+          stroke: '#4e493c',
+          'stroke-width': '2',
+        }),
+        domElements.text('', {
+          x: state.character.x,
+          y: state.character.y,
+          classList: ['character'],
+          'font-size': '36px'
+        }),
+        domElements.g({classList: ['dot-layer']}),
+        domElements.path({
+          classList: ['tunnel'],
+          d: `M 250,211
+            A 15,39 0,0,1 250,289
+            L 1050,289
+            A 15,39 0,0,1 1050,211
+            z`,
+          fill: '#e96214',
+          stroke: '#4e493c',
+          'stroke-width': '2'
+        }),
+        domElements.rect({
+          classList: ['lighting-effect'],
+          x: -40,
+          y: 0,
+          height: 1500,
+          width: 2000,
+          fill: 'transparent'
+        }),
+      ].filter(i => !!i));
+    };
+
+    const viewBoxAttribute = (a) => {
+      return a.join(' ');
+    };
+
+    const ReturnPrompt = () => {
+      return domElements.div({classList: ['title-panel']}, [
+        Button('Return', () => {
+          scrollViewBoxBack();
+        })
+      ]);
+    };
+
+    return () => {
+      return [
+        Narration(),
+        TopText(),
+        World(),
+        LowerText(),
+        Title({visible: state.titleScreenVisible}),
+        ButtonPanel({visible: state.panelVisible})
+      ];
+    };
+  })();
 
   const narrationText = (text) => {
     const narration = state.nodes.stage.querySelector('#narration');
@@ -395,7 +521,8 @@ const init = (rootNode) => {
     narration.classList.add('fade');
   };
 
-  const effects = (effectsList, done = () => {}) => {
+  const effects = (effectsList, done = () => {
+  }) => {
     let last = effectsList.reverse()[0];
     return [...effectsList, [last[0], done]].map(([timing, f]) => {
       setTimeout(f, timing);
@@ -403,23 +530,6 @@ const init = (rootNode) => {
         time: timing,
       }
     }).reverse()[0].time;
-  };
-
-  const ItemButton = (item) => {
-    return Button(item.characterEmoji, () => {
-      state = {
-        ...state,
-        panelVisible: false,
-        activeStory: item,
-      };
-      startScene();
-    });
-  };
-
-  const ButtonPanel = () => {
-    return domElements.div({
-      classList: ['button-panel'].filter(i => !!i)
-    }, items.map(ItemButton));
   };
 
   function reinitialize() {
@@ -447,14 +557,6 @@ const init = (rootNode) => {
     }
   };
 
-  const ReturnPrompt = () => {
-    return div({classList: ['title-panel']}, [
-      Button('Return', () => {
-        scrollViewBoxBack();
-      })
-    ]);
-  };
-
   const zoomViewBoxOut = () => {
     effects(repeat(100).map(i => {
       return [i * 5, () => {
@@ -466,135 +568,54 @@ const init = (rootNode) => {
     }));
   };
 
-  const Title = () => {
-    return domElements.div({classList: ['title-panel', 'visible']}, [
-      P('A mysterious portal has opened in a quiet village...'),
-      P('when villagers wander in, they think they\'re talking about one thing, but end up saying something else'),
-      Button('Start', () => {
-        state = {
-          ...state,
-          titleScreenVisible: false,
-          panelVisible: true,
-        };
-        zoomViewBoxOut();
-      }),
-      P('Inspired by the henshin tunnel series by AKIYAMA TADASHI'),
-      P('Special thanks to CMU Pronouncing Dictionary, PostgreSQL, Array#rotate, and to my son\'s バーバ  for the play mat that inspired the color palette')
-    ]);
-  };
-
-  const Audio = (url) => {
-    let node = document.createElement('audio');
-    node.src = url;
-    node.controls = false;
-    node.autoplay = true;
-    return node;
-  };
-
-  const P = (text) => {
-    return (domElements.p({}, [document.createTextNode(text)]));
-  };
-
-  const Button = (text, onClick, options = {}) => {
-    let b = domElements.button(options, [document.createTextNode(text)]);
-    b.onclick = onClick;
-    return b;
-  };
-
   const clear = (node) => {
     [...node.childNodes].map(e => node.removeChild(e));
   };
 
-  const viewBoxAttribute = (a) => {
-    return a.join(' ');
-  };
+  const animate = (() => {
+    const updateButtonPanel = visible => {
+      let panel = state.nodes.root.querySelector('.button-panel');
+      panel.classList[visible ? 'add' : 'remove']('visible');
+    };
 
-  const World = () => {
-    return domElements.svg({viewBox: viewBoxAttribute(state.viewBox)}, [
-      domElements.ellipse({
-        classList: ['tunnel'],
-        cx: "250",
-        cy: "250",
-        ry: "39",
-        rx: '15',
-        fill: '#e96214',
-        stroke: '#4e493c',
-        'stroke-width': '2',
-      }),
-      domElements.ellipse({
-        classList: ['tunnel'],
-        cx: "1050",
-        cy: "250",
-        ry: "39",
-        rx: '15',
-        fill: '#e96214',
-        stroke: '#4e493c',
-        'stroke-width': '2',
-      }),
-      domElements.text('', {x: state.character.x, y: state.character.y, classList: ['character'], 'font-size': '36px'}),
-      domElements.g({classList: ['dot-layer']}),
-      domElements.path({
-        classList: ['tunnel'],
-        d: `M 250,211
-            A 15,39 0,0,1 250,289
-            L 1050,289
-            A 15,39 0,0,1 1050,211
-            z`,
-        fill: '#e96214',
-        stroke: '#4e493c',
-        'stroke-width': '2'
-      }),
-      domElements.rect({classList: ['lighting-effect'], x: -40, y: 0, height: 1500, width: 2000, fill: 'transparent'}),
-    ].filter(i => !!i));
-  };
+    const updateTitleScreen = visible => {
+      let panel = state.nodes.root.querySelector('.title-panel');
+      panel.classList[!visible ? 'add' : 'remove']('hidden');
+    };
 
-  state.nodes = {
-    stage: rootNode.querySelector('#stage'),
-    root: rootNode,
-  };
+    const updateCharacter = character => {
+      let characterNode = state.nodes.root.querySelector('.character');
+      if (state.activeStory) {
+        characterNode.textContent = state.activeStory.characterEmoji;
+      }
+      characterNode.setAttribute('x', character.x);
+      characterNode.setAttribute('y', character.y);
+    };
 
-  const updateButtonPanel = visible => {
-    let panel = state.nodes.root.querySelector('.button-panel');
-    panel.classList[visible ? 'add' : 'remove']('visible');
-  };
+    const updateNarrationButton = visible => {
+      const button = state.nodes.root.querySelector('.narration-button');
+      button.classList[visible ? 'add' : 'remove']('visible');
+    };
 
-  const updateTitleScreen = visible => {
-    let panel = state.nodes.root.querySelector('.title-panel');
-    panel.classList[!visible ? 'add' : 'remove']('hidden');
-  };
+    const updateViewBox = viewBox => {
+      let svg = state.nodes.root.querySelector('svg');
+      if (viewBox.join(' ') === svg.getAttribute('viewBox')) {
+        return;
+      }
+      svg.setAttribute('viewBox', viewBox.join(' '));
+    };
 
-  const updateCharacter = character => {
-    let characterNode = state.nodes.root.querySelector('.character');
-    if (state.activeStory) {
-      characterNode.textContent = state.activeStory.characterEmoji;
-    }
-    characterNode.setAttribute('x', character.x);
-    characterNode.setAttribute('y', character.y);
-  };
-
-  const updateNarrationButton = visible => {
-    const button = state.nodes.root.querySelector('.narration-button');
-    button.classList[visible ? 'add' : 'remove']('visible');
-  };
-
-  const updateViewBox = viewBox => {
-    let svg = state.nodes.root.querySelector('svg');
-    if (viewBox.join(' ') === svg.getAttribute('viewBox')) {
-      return;
-    }
-    svg.setAttribute('viewBox', viewBox.join(' '));
-  };
-
-  const animate = (timestamp) => {
-    state.currentTime = timestamp;
-    state.terminated = state.currentTime > state.clockStart + (60 * 1000);
-    updateButtonPanel(state.panelVisible);
-    updateTitleScreen(state.titleScreenVisible);
-    updateViewBox(state.viewBox);
-    updateNarrationButton(state.narrationButtonVisible);
-    state.character && updateCharacter(state.character);
-    state.terminated || requestAnimationFrame(animate);
-  };
+    return (timestamp) => {
+      state.currentTime = timestamp;
+      state.terminated = state.currentTime > state.clockStart + (60 * 1000);
+      updateButtonPanel(state.panelVisible);
+      updateTitleScreen(state.titleScreenVisible);
+      updateViewBox(state.viewBox);
+      updateNarrationButton(state.narrationButtonVisible);
+      state.character && updateCharacter(state.character);
+      state.terminated || requestAnimationFrame(animate);
+    };
+  })();
 
   const draw = () => {
     let nodes = render();
