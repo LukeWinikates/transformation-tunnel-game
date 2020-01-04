@@ -170,199 +170,236 @@ const init = (rootNode) => {
     }
   };
 
-  const panViewBox = () => {
-    effects(repeat(900).map(i => {
-      return [
-        (i + 1) * 7,
-        () => {
-          [x, y, w, h] = state.viewBox;
-          let newViewBox = [x + 1, y, w, h];
-          state = {
-            ...state,
-            viewBox: newViewBox
-          };
-        }
-      ]
-    }));
-  };
+  const repeat = times => [...Array(times).keys()];
 
-  const flashLighting = color => {
-    const lighting = document.querySelector('.lighting-effect');
-    lighting.setAttribute('fill', color);
-  };
-
-  const strobeTunnel = () => {
-    const tunnel = document.querySelectorAll('.tunnel');
-    effects(repeat(10).map(i => {
-      const base = (i + 1) * 500;
-      return [
-        [base, () => {
-          const newColor = state.tunnelFillColor === '#e2ac22' ? '#e96214' : '#e2ac22';
-          state = {
-            ...state,
-            tunnelFillColor: newColor
-          };
-          [...tunnel].forEach(e => {
-            e.setAttribute('fill', newColor)
-          });
-          flashLighting(newColor);
-        }],
-        [base + 100, () => {
-          flashLighting('transparent')
-        }]
-      ]
-    }).flat());
-  };
-
-  const dropDot = ({x, y}) => {
-    let dotLayer = document.querySelector('.dot-layer');
-    let dot = domElements.circle({cx: x, cy: y + 1, r: 3, fill: '#4e493c', classList: ['dropdot']});
-    dotLayer.appendChild(dot);
-    effects([
-      [250, () => dot.setAttribute('r', 2)],
-      [500, () => dot.setAttribute('fill', 'transparent')],
-      [1000, () => dot.remove()]
-    ]);
-  };
-
-  function repeat(times) {
-    return [...Array(times).keys()];
-  }
-
-  const after = (waitTime, steps, done = () => {
-  }) => {
-    return effects(steps.map(([t, f]) => {
-      return [t + waitTime, f]
-    }), done);
-  };
-
-  const dropEmoji = (emoji) => {
-    let dotLayer = document.querySelector('.dot-layer');
-    let emojiElement = domElements.text(emoji, {x: state.character.x + 10, y: state.character.y - 40});
-    dotLayer.appendChild(emojiElement);
-    effects([
-      [500, () => emojiElement.setAttribute('color', 'transparent')],
-      [1000, () => emojiElement.remove()],
-    ]);
-  };
-
-  const swirlEmojiAroundCharacter = (thoughtEmoji) => {
-    effects([
-      [0, () => dropEmoji(thoughtEmoji[0])],
-      [2000, () => dropEmoji(thoughtEmoji[1])]
-    ]);
-  };
-
-  const showNarrationButton = () => {
+  const reinitialize = () => {
     state = {
       ...state,
-      narrationButtonVisible: true
-    }
+      titleScreenVisible: false,
+      panelVisible: true,
+      character: positions.characterEntryPoint,
+      activeStory: null,
+    };
+    draw();
   };
 
-  const hideNarrationButton = () => {
-    state = {
-      ...state,
-      narrationButtonVisible: false
-    }
-  };
-
-  const moveTo = (f, start, dest, speed) => {
-    let distance = (Math.sqrt(Math.pow(Math.abs(dest.x - start.x), 2) + Math.pow(Math.abs(dest.y - start.y), 2)));
-    let changeX = (dest.x - start.x) / distance;
-    let changeY = (dest.y - start.y) / distance;
-    return repeat(distance).map(i => {
-        const tickCount = i + 1;
-        const animationTime = tickCount * speed;
-        const newX = start.x + (tickCount * changeX);
-        const newY = start.y + (tickCount * changeY);
-        return [animationTime, () => f({
-          x: newX,
-          y: newY,
-          i
-        })
+  const startScene = (() => {
+    const panViewBox = () => {
+      effects(repeat(900).map(i => {
+        return [
+          (i + 1) * 7,
+          () => {
+            [x, y, w, h] = state.viewBox;
+            let newViewBox = [x + 1, y, w, h];
+            state = {
+              ...state,
+              viewBox: newViewBox
+            };
+          }
         ]
-      }
-    );
-  };
-
-  const moveCharacter = ({x, y, i}) => {
-    state = {
-      ...state,
-      character: {x, y}
-    };
-    if (i % 30 === 0) {
-      dropDot({x, y})
-    }
-  };
-
-  const startScene = () => {
-    state = {
-      ...state,
-      character: {
-        ...positions.characterEntryPoint
-      }
+      }));
     };
 
-    let characterSpeed = 10; // 10px per s
-
-    let step1 = () => {
-      hideNarrationButton();
-      let showNarration = effects([
-        [0, () => narrationText(state.activeStory.introText)],
-      ]);
-      after(showNarration + 1500, moveTo(moveCharacter, positions.characterEntryPoint, positions.characterPauseLocation, characterSpeed), showNarrationButton);
-      state.nextStep = step2;
+    const flashLighting = color => {
+      const lighting = document.querySelector('.lighting-effect');
+      lighting.setAttribute('fill', color);
     };
 
-    // step 1
-
-    let step2 = () => {
-      hideNarrationButton();
-      after(0, [
-        [0, fadeNarration],
-        [1000, () => narrationText(state.activeStory.postIntroText)],
-        [1500, () => swirlEmojiAroundCharacter(state.activeStory.initialThoughtEmoji)]
-      ], showNarrationButton);
-      state.nextStep = step3;
-    };
-
-    let step3 = () => {
-      hideNarrationButton();
-      fadeNarration();
-      let moveToTunnel = after(1500, moveTo(moveCharacter, positions.characterPauseLocation, positions.tunnelEntrance, characterSpeed));
-      let characterExitsTunnel = after(moveToTunnel, moveTo(moveCharacter, positions.tunnelEntrance, positions.tunnelExitPauseLocation, characterSpeed));
-
-      after(moveToTunnel - 500, [[0, () => {
-        panViewBox();
-        strobeTunnel();
-      }]]);
-
-      const topText = state.nodes.root.querySelector('.top-text');
-      const lowerText = state.nodes.root.querySelector('.lower-text');
-      after(moveToTunnel,
-        repeat(8).map(i => {
-          return [(i + 1) * 500, () => {
-            let target = i < 4 ? topText : lowerText;
-            if (i === 2 || i === 7) {
-              target.appendChild(domElements.br({}));
-            }
-            target.appendChild(document.createTextNode(state.activeStory.transitions[i]));
+    const strobeTunnel = () => {
+      const tunnel = document.querySelectorAll('.tunnel');
+      effects(repeat(10).map(i => {
+        const base = (i + 1) * 500;
+        return [
+          [base, () => {
+            const newColor = state.tunnelFillColor === '#e2ac22' ? '#e96214' : '#e2ac22';
+            state = {
+              ...state,
+              tunnelFillColor: newColor
+            };
+            [...tunnel].forEach(e => {
+              e.setAttribute('fill', newColor)
+            });
+            flashLighting(newColor);
+          }],
+          [base + 100, () => {
+            flashLighting('transparent')
           }]
-        })
-      );
-
-      after(characterExitsTunnel, [
-        [1000, () => narrationText(state.activeStory.finalText)],
-        [1000, () => swirlEmojiAroundCharacter(state.activeStory.finalThoughtEmoji)],
-        [5000, () => {
-        }]
-      ], showNarrationButton);
-      state.nextStep = scrollViewBoxBack;
+        ]
+      }).flat());
     };
 
-    step1();
-  };
+    const dropDot = ({x, y}) => {
+      let dotLayer = document.querySelector('.dot-layer');
+      let dot = domElements.circle({cx: x, cy: y + 1, r: 3, fill: '#4e493c', classList: ['dropdot']});
+      dotLayer.appendChild(dot);
+      effects([
+        [250, () => dot.setAttribute('r', 2)],
+        [500, () => dot.setAttribute('fill', 'transparent')],
+        [1000, () => dot.remove()]
+      ]);
+    };
+
+    const after = (waitTime, steps, done = () => {
+    }) => {
+      return effects(steps.map(([t, f]) => {
+        return [t + waitTime, f]
+      }), done);
+    };
+
+    const dropEmoji = (emoji) => {
+      let dotLayer = document.querySelector('.dot-layer');
+      let emojiElement = domElements.text(emoji, {x: state.character.x + 10, y: state.character.y - 40});
+      dotLayer.appendChild(emojiElement);
+      effects([
+        [500, () => emojiElement.setAttribute('color', 'transparent')],
+        [1000, () => emojiElement.remove()],
+      ]);
+    };
+
+    const swirlEmojiAroundCharacter = (thoughtEmoji) => {
+      effects([
+        [0, () => dropEmoji(thoughtEmoji[0])],
+        [2000, () => dropEmoji(thoughtEmoji[1])]
+      ]);
+    };
+
+    const showNarrationButton = () => {
+      state = {
+        ...state,
+        narrationButtonVisible: true
+      }
+    };
+
+    const hideNarrationButton = () => {
+      state = {
+        ...state,
+        narrationButtonVisible: false
+      }
+    };
+
+    const moveTo = (f, start, dest, speed) => {
+      let distance = (Math.sqrt(Math.pow(Math.abs(dest.x - start.x), 2) + Math.pow(Math.abs(dest.y - start.y), 2)));
+      let changeX = (dest.x - start.x) / distance;
+      let changeY = (dest.y - start.y) / distance;
+      return repeat(distance).map(i => {
+          const tickCount = i + 1;
+          const animationTime = tickCount * speed;
+          const newX = start.x + (tickCount * changeX);
+          const newY = start.y + (tickCount * changeY);
+          return [animationTime, () => f({
+            x: newX,
+            y: newY,
+            i
+          })
+          ]
+        }
+      );
+    };
+
+    const moveCharacter = ({x, y, i}) => {
+      state = {
+        ...state,
+        character: {x, y}
+      };
+      if (i % 30 === 0) {
+        dropDot({x, y})
+      }
+    };
+
+    const narrationText = (text) => {
+      const narration = state.nodes.stage.querySelector('#narration');
+      narration.classList.remove('fade');
+      clear(narration.querySelector('#narration-text'));
+      narration.querySelector('#narration-text').appendChild(document.createTextNode(text));
+    };
+
+    const fadeNarration = () => {
+      const narration = state.nodes.stage.querySelector('#narration');
+      narration.classList.add('fade');
+    };
+
+    const scrollViewBoxBack = () => {
+      let [x, y, w, h] = state.viewBox;
+      state = {
+        ...state,
+        viewBox: [x - 2, y, w, h]
+      };
+
+      if (+x > 80) {
+        scrollViewBoxBack();
+      } else {
+        reinitialize();
+      }
+    };
+
+    return () => {
+      state = {
+        ...state,
+        character: {
+          ...positions.characterEntryPoint
+        }
+      };
+
+      let characterSpeed = 10; // 10px per s
+
+      let step1 = () => {
+        hideNarrationButton();
+        let showNarration = effects([
+          [0, () => narrationText(state.activeStory.introText)],
+        ]);
+        after(showNarration + 1500, moveTo(moveCharacter, positions.characterEntryPoint, positions.characterPauseLocation, characterSpeed), showNarrationButton);
+        state.nextStep = step2;
+      };
+
+      // step 1
+
+      let step2 = () => {
+        hideNarrationButton();
+        after(0, [
+          [0, fadeNarration],
+          [1000, () => narrationText(state.activeStory.postIntroText)],
+          [1500, () => swirlEmojiAroundCharacter(state.activeStory.initialThoughtEmoji)]
+        ], showNarrationButton);
+        state.nextStep = step3;
+      };
+
+      let step3 = () => {
+        hideNarrationButton();
+        fadeNarration();
+        let moveToTunnel = after(1500, moveTo(moveCharacter, positions.characterPauseLocation, positions.tunnelEntrance, characterSpeed));
+        let characterExitsTunnel = after(moveToTunnel, moveTo(moveCharacter, positions.tunnelEntrance, positions.tunnelExitPauseLocation, characterSpeed));
+
+        after(moveToTunnel - 500, [[0, () => {
+          panViewBox();
+          strobeTunnel();
+        }]]);
+
+        const topText = state.nodes.root.querySelector('.top-text');
+        const lowerText = state.nodes.root.querySelector('.lower-text');
+        after(moveToTunnel,
+          repeat(8).map(i => {
+            return [(i + 1) * 500, () => {
+              let target = i < 4 ? topText : lowerText;
+              if (i === 2 || i === 7) {
+                target.appendChild(domElements.br({}));
+              }
+              target.appendChild(document.createTextNode(state.activeStory.transitions[i]));
+            }]
+          })
+        );
+
+        after(characterExitsTunnel, [
+          [1000, () => narrationText(state.activeStory.finalText)],
+          [1000, () => swirlEmojiAroundCharacter(state.activeStory.finalThoughtEmoji)],
+          [5000, () => {
+          }]
+        ], showNarrationButton);
+        state.nextStep = scrollViewBoxBack;
+      };
+
+      step1();
+    };
+  })();
 
   const render = (() => {
     function Narration() {
@@ -509,18 +546,6 @@ const init = (rootNode) => {
     };
   })();
 
-  const narrationText = (text) => {
-    const narration = state.nodes.stage.querySelector('#narration');
-    narration.classList.remove('fade');
-    clear(narration.querySelector('#narration-text'));
-    narration.querySelector('#narration-text').appendChild(document.createTextNode(text));
-  };
-
-  const fadeNarration = () => {
-    const narration = state.nodes.stage.querySelector('#narration');
-    narration.classList.add('fade');
-  };
-
   const effects = (effectsList, done = () => {
   }) => {
     let last = effectsList.reverse()[0];
@@ -530,31 +555,6 @@ const init = (rootNode) => {
         time: timing,
       }
     }).reverse()[0].time;
-  };
-
-  function reinitialize() {
-    state = {
-      ...state,
-      titleScreenVisible: false,
-      panelVisible: true,
-      character: positions.characterEntryPoint,
-      activeStory: null,
-    };
-    draw();
-  }
-
-  const scrollViewBoxBack = () => {
-    let [x, y, w, h] = state.viewBox;
-    state = {
-      ...state,
-      viewBox: [x - 2, y, w, h]
-    };
-
-    if (+x > 80) {
-      scrollViewBoxBack();
-    } else {
-      reinitialize();
-    }
   };
 
   const zoomViewBoxOut = () => {
