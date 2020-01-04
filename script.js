@@ -19,7 +19,7 @@ const init = (rootNode) => {
       id: 'elixir',
       audio: '/audio/elixir.m4a',
       introText: 'a wizard had been trying to decipher a mysterious formula',
-      postIntroText: '"I must discover the secret of the ELIXIR!, but what is this strange writing!?"',
+      postIntroText: '"I must discover the secret of the ELIXIR!, but I can\'t make heads or tails of this strange writing"',
       initialWord: 'elixir',
       characterEmoji: '🧙' + randomSkinTone() + randomGenderModifier(),
       initialThoughtEmoji: ['⚗️', '📕'],
@@ -35,7 +35,7 @@ const init = (rootNode) => {
       characterEmoji: randomGender() + randomSkinTone() + '‍🍳',
       initialThoughtEmoji: ['🍝', '🇮🇹'],
       finalThoughtEmoji: ['🥘', '🇪🇸'],
-      transitions: ['pasta ', 'pasta', 'pasTA', 'PASta', 'pasTA', 'PAS', 'TAPAS', 'tapas!', 'tapas!'],
+      transitions: ['pasta ', 'pasta', 'pasTA', 'PASta', 'pasTA', 'PAS ', 'TAPAS ', 'tapas! ', 'tapas!'],
       finalText: '"I can freshen things up by making lots of tasty TAPAS!"'
 
     },
@@ -61,64 +61,70 @@ const init = (rootNode) => {
     }
   ];
 
-  const element = (tag, {classList = [], key, ...rest}, children = []) => {
-    let e = document.createElement(tag);
-    classList.forEach(c => {
-      e.classList.add(c);
-    });
-    children.forEach(c => {
-      e.appendChild(c);
-    });
-    Object.entries(rest).forEach(([attr, val]) => {
-      e.setAttribute(attr, val);
-    });
-    return e;
-  };
+  const domElements = (() =>{
+    const elementBuilders = (tagNames) => {
+      return tagNames.reduce((acc, tagName) => {
+        return {
+          ...acc,
+          [tagName]: (...args) => element.apply(null, [tagName, ...args])
+        }
+      }, {});
+    };
 
-  const svgElement = (tag, {classList = [], key, svgAttrs = {}, ...rest}, children = []) => {
-    let e = document.createElementNS('http://www.w3.org/2000/svg', tag);
-    children.forEach(c => {
-      e.appendChild(c);
-    });
-    classList.forEach(c => {
-      e.classList.add(c);
-    });
+    const svgElementBuilders = (tagNames) => {
+      return tagNames.reduce((acc, tagName) => {
+        return {
+          ...acc,
+          [tagName]: (...args) => svgElement.apply(null, [tagName, ...args])
+        }
+      }, {});
+    };
+    const element = (tag, {classList = [], key, ...rest}, children = []) => {
+      let e = document.createElement(tag);
+      classList.forEach(c => {
+        e.classList.add(c);
+      });
+      children.forEach(c => {
+        e.appendChild(c);
+      });
+      Object.entries(rest).forEach(([attr, val]) => {
+        e.setAttribute(attr, val);
+      });
+      return e;
+    };
 
-    Object.entries(svgAttrs).forEach(([attr, val]) => {
-      e.setAttributeNS('http://www.w3.org/1999/xlink', attr, val);
-    });
-    Object.entries(rest).forEach(([attr, val]) => {
-      e.setAttribute(attr, val);
-    });
-    return e;
-  };
+    const svgElement = (tag, {classList = [], key, svgAttrs = {}, ...rest}, children = []) => {
+      let e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+      children.forEach(c => {
+        e.appendChild(c);
+      });
+      classList.forEach(c => {
+        e.classList.add(c);
+      });
 
-  const elementBuilders = (tagNames) => {
-    return tagNames.reduce((acc, tagName) => {
-      return {
-        ...acc,
-        [tagName]: (...args) => element.apply(null, [tagName, ...args])
-      }
-    }, {});
-  };
+      Object.entries(svgAttrs).forEach(([attr, val]) => {
+        e.setAttributeNS('http://www.w3.org/1999/xlink', attr, val);
+      });
+      Object.entries(rest).forEach(([attr, val]) => {
+        e.setAttribute(attr, val);
+      });
+      return e;
+    };
 
-  const svgElementBuilders = (tagNames) => {
-    return tagNames.reduce((acc, tagName) => {
-      return {
-        ...acc,
-        [tagName]: (...args) => svgElement.apply(null, [tagName, ...args])
-      }
-    }, {});
-  };
+    const {
+      div, p, button, span, br
+    } = elementBuilders(['div', 'p', 'button', 'span', 'br']);
+    const {
+      svg, circle, ellipse, rect, g, path
+    } = svgElementBuilders(['svg', 'circle', 'ellipse', 'rect', 'g', 'path']);
+    const text = (content, opts) => svgElement('text', opts, [document.createTextNode(content)]);
 
-  const {
-    div, p, button, span, br
-  } = elementBuilders(['div', 'p', 'button', 'span', 'br']);
-  const {
-    svg, circle, ellipse, rect, g, path
-  } = svgElementBuilders(['svg', 'circle', 'ellipse', 'rect', 'g', 'path']);
-
-  const text = (content, opts) => svgElement('text', opts, [document.createTextNode(content)]);
+    return {
+      div, p, button, span, br,
+      svg, circle, ellipse, rect, g, path,
+      text
+    }
+  })();
 
   let positions = {
     characterEntryPoint: {
@@ -203,7 +209,7 @@ const init = (rootNode) => {
 
   const dropDot = ({x, y}) => {
     let dotLayer = document.querySelector('.dot-layer');
-    let dot = circle({cx: x, cy: y + 1, r: 3, fill: '#4e493c', classList: ['dropdot']});
+    let dot = domElements.circle({cx: x, cy: y + 1, r: 3, fill: '#4e493c', classList: ['dropdot']});
     dotLayer.appendChild(dot);
     effects([
       [250, () => dot.setAttribute('r', 2)],
@@ -224,7 +230,7 @@ const init = (rootNode) => {
 
   const dropEmoji = (emoji) => {
     let dotLayer = document.querySelector('.dot-layer');
-    let emojiElement = text(emoji, {x: state.character.x + 10, y: state.character.y - 40});
+    let emojiElement = domElements.text(emoji, {x: state.character.x + 10, y: state.character.y - 40});
     dotLayer.appendChild(emojiElement);
     effects([
       [500, () => emojiElement.setAttribute('color', 'transparent')],
@@ -331,59 +337,27 @@ const init = (rootNode) => {
           return [(i + 1) * 500, () => {
             let target = i < 4 ? topText : lowerText;
             if(i === 2 || i === 7) {
-              target.appendChild(br({}));
+              target.appendChild(domElements.br({}));
             }
             target.appendChild(document.createTextNode(state.activeStory.transitions[i]));
           }]
         })
       );
-          // [500, () => {
-          //   topText.appendChild(span({}, [document.createTextNode(state.activeStory.transitions[i])]))
-          // }],
-          // [1000, () => {
-          //   topText.appendChild(span({}, [document.createTextNode('LIPstick ')]))
-          // }],
-          // [1500, () => {
-          //   topText.appendChild(br({}));
-          //   topText.appendChild(span({}, [document.createTextNode('LIPSEDe')]))
-          // }],
-          // [2000, () => {
-          //   topText.appendChild(span({}, [document.createTextNode('CLIPSEd')]))
-          // }],
-          // [2500, () => {
-          //   lowerText.appendChild(span({}, [document.createTextNode('ECLIPSED ')]))
-          // }],
-          // [3000, () => {
-          //   lowerText.appendChild(span({}, [document.createTextNode('ECLIPSED ')]))
-          // }],
-          // [3500, () => {
-          //   lowerText.appendChild(br({}));
-          //   lowerText.appendChild(span({}, [document.createTextNode('ECLIPSED ')]))
-          // }],
-          // [4000, () => {
-          //   lowerText.appendChild(span({}, [document.createTextNode('ECLIPSED ')]))
-          // }],
-        // ]
-      // );
 
       after(characterExitsTunnel, [
         [1000, () => narrationText(state.activeStory.finalText)],
         [1000, () => swirlEmojiAroundCharacter(state.activeStory.finalThoughtEmoji)],
-        [5000, showReturnButton]
+        [5000, () =>{}]
       ], showNarrationButton);
-      state.nextStep = () => {};
+      state.nextStep = scrollViewBoxBack;
     };
 
     step1();
   };
 
-  const showReturnButton = () => {
-    state.nodes.stage.appendChild(ReturnPrompt());
-  };
-
   function Narration() {
-    return div({id: 'narration', classList: ['fade']}, [
-      span({id: 'narration-text'}),
+    return domElements.div({id: 'narration', classList: ['fade']}, [
+      domElements.span({id: 'narration-text'}),
       Button('next...', () => {
         state.nextStep();
       }, { classList: ['narration-button'] })
@@ -391,11 +365,11 @@ const init = (rootNode) => {
   }
 
   function TopText() {
-    return div({classList: ['top-text']});
+    return domElements.div({classList: ['top-text']});
   }
 
   function LowerText() {
-    return div({classList: ['lower-text']});
+    return domElements.div({classList: ['lower-text']});
   }
 
   const render = () => {
@@ -443,7 +417,7 @@ const init = (rootNode) => {
   };
 
   const ButtonPanel = () => {
-    return div({
+    return domElements.div({
       classList: ['button-panel'].filter(i => !!i)
     }, items.map(ItemButton));
   };
@@ -493,7 +467,7 @@ const init = (rootNode) => {
   };
 
   const Title = () => {
-    return div({classList: ['title-panel', 'visible']}, [
+    return domElements.div({classList: ['title-panel', 'visible']}, [
       P('A mysterious portal has opened in a quiet village...'),
       P('when villagers wander in, they think they\'re talking about one thing, but end up saying something else'),
       Button('Start', () => {
@@ -505,7 +479,7 @@ const init = (rootNode) => {
         zoomViewBoxOut();
       }),
       P('Inspired by the henshin tunnel series by AKIYAMA TADASHI'),
-      P('Special thanks to CMU Pronouncing Dictionary, PostgreSQL, Array#rotate')
+      P('Special thanks to CMU Pronouncing Dictionary, PostgreSQL, Array#rotate, and to my son\'s バーバ  for the play mat that inspired the color palette')
     ]);
   };
 
@@ -518,11 +492,11 @@ const init = (rootNode) => {
   };
 
   const P = (text) => {
-    return (p({}, [document.createTextNode(text)]));
+    return (domElements.p({}, [document.createTextNode(text)]));
   };
 
   const Button = (text, onClick, options = {}) => {
-    let b = button(options, [document.createTextNode(text)]);
+    let b = domElements.button(options, [document.createTextNode(text)]);
     b.onclick = onClick;
     return b;
   };
@@ -536,8 +510,8 @@ const init = (rootNode) => {
   };
 
   const World = () => {
-    return svg({viewBox: viewBoxAttribute(state.viewBox)}, [
-      ellipse({
+    return domElements.svg({viewBox: viewBoxAttribute(state.viewBox)}, [
+      domElements.ellipse({
         classList: ['tunnel'],
         cx: "250",
         cy: "250",
@@ -547,7 +521,7 @@ const init = (rootNode) => {
         stroke: '#4e493c',
         'stroke-width': '2',
       }),
-      ellipse({
+      domElements.ellipse({
         classList: ['tunnel'],
         cx: "1050",
         cy: "250",
@@ -557,9 +531,9 @@ const init = (rootNode) => {
         stroke: '#4e493c',
         'stroke-width': '2',
       }),
-      text('', {x: state.character.x, y: state.character.y, classList: ['character'], 'font-size': '36px'}),
-      g({classList: ['dot-layer']}),
-      path({
+      domElements.text('', {x: state.character.x, y: state.character.y, classList: ['character'], 'font-size': '36px'}),
+      domElements.g({classList: ['dot-layer']}),
+      domElements.path({
         classList: ['tunnel'],
         d: `M 250,211
             A 15,39 0,0,1 250,289
@@ -570,7 +544,7 @@ const init = (rootNode) => {
         stroke: '#4e493c',
         'stroke-width': '2'
       }),
-      rect({classList: ['lighting-effect'], x: -40, y: 0, height: 1500, width: 2000, fill: 'transparent'}),
+      domElements.rect({classList: ['lighting-effect'], x: -40, y: 0, height: 1500, width: 2000, fill: 'transparent'}),
     ].filter(i => !!i));
   };
 
@@ -599,7 +573,8 @@ const init = (rootNode) => {
   };
 
   const updateNarrationButton = visible => {
-    state.nodes.root.querySelector('.narration-button').classList[visible ? 'add' : 'remove']('visible');
+    const button = state.nodes.root.querySelector('.narration-button');
+    button.classList[visible ? 'add' : 'remove']('visible');
   };
 
   const updateViewBox = viewBox => {

@@ -190,6 +190,7 @@ button:hover {
   font-size: 32px;
   font-family: 'Andale Mono', 'Monaco', 'sans-serif';
   color: var(--sea-blue);
+  line-height: 1.4em;
   padding: 5px;
 }
 
