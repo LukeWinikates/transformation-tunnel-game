@@ -30,7 +30,7 @@ const init = (rootNode) => {
         characterEmoji: '🧙' + randomSkinTone() + randomGenderModifier(),
         initialThoughtEmoji: ['⚗️', '📕'],
         finalThoughtEmoji: ["Ого!", 'Вот это да!'],
-        transitions: ['elixir', 'elixir', 'eliXIR', 'ELIXir', 'eliXIR', 'YLLIC', 'CYRILLIC', 'CYRILLIC!?'],
+        transitions: [['elix', 'ir'], ['elix', 'ir'], ['elix', 'ir'], ['illic...?', ''], ['cyr', 'illic'], ['cyr', 'illic'], ['cyr', 'illic'], ['cyr', 'illic']],
         finalText: '"Of course! The recipe is in CYRILLIC!"'
       },
       {
@@ -41,7 +41,7 @@ const init = (rootNode) => {
         characterEmoji: randomGender() + randomSkinTone() + '‍🍳',
         initialThoughtEmoji: ['🍝', '🇮🇹'],
         finalThoughtEmoji: ['🥘', '🇪🇸'],
-        transitions: ['pasta ', 'pasta', 'pasTA', 'PASta', 'pasTA', 'PAS ', 'TAPAS ', 'tapas! ', 'tapas!'],
+        transitions: [['pas', 'ta'], ['pas', 'ta'], ['pas', 'ta'], ['pas', ''], ['ta', 'pas'], ['ta', 'pas'], ['ta', 'pas']],
         finalText: '"I can freshen things up by making lots of tasty TAPAS!"'
 
       },
@@ -52,7 +52,7 @@ const init = (rootNode) => {
         characterEmoji: randomGender() + randomSkinTone() + '‍🌾',
         initialThoughtEmoji: ['🚚', '🆘'],
         finalThoughtEmoji: ['👤', '🏯'],
-        transitions: ['engine', 'enGIN', 'ENgiNE', 'NG', 'INE', 'NINJA!', 'NINJA!'],
+        transitions: [['en', 'gine'], ['en', 'gine'], ['en', 'gine'], ['nin', 'ja'], ['nin', 'ja'], ['nin', 'ja']],
         finalText: '"I can hire a NINJA to deliver the crops and nobody will know it wasn\'t me!"'
       },
       {
@@ -62,7 +62,7 @@ const init = (rootNode) => {
         characterEmoji: randomGender() + randomSkinTone() + '‍💼',
         initialThoughtEmoji: ['💄', '📊'],
         finalThoughtEmoji: ['🌘', '🖤'],
-        transitions: ['lipstick ', 'LIPstick ', 'LIPSEDe', 'CLIPSEd', 'ECLIPSED ', 'ECLIPSED ', 'ECLIPSED ', 'ECLIPSED '],
+        transitions: [['lip', 'stick'], ['lip', 'stick'], ['lip', 'stick'], ['lip', 'sed...?'], ['ec', 'lipsed'], ['ec', 'lipsed'], ['ec', 'lipsed!']],
         finalText: '"The matte black is just like when the moon is fully ECLIPSED!"'
       }
     ]
@@ -380,18 +380,41 @@ const init = (rootNode) => {
         }]]);
 
         const topText = state.nodes.root.querySelector('.top-text');
-        const lowerText = state.nodes.root.querySelector('.lower-text');
-        after(moveToTunnel,
-          repeat(8).map(i => {
-            return [(i + 1) * 500, () => {
-              let target = i < 4 ? topText : lowerText;
-              if (i === 2 || i === 7) {
-                target.appendChild(domElements.br({}));
-              }
-              target.appendChild(document.createTextNode(state.activeStory.transitions[i]));
-            }]
+        // const lowerText = state.nodes.root.querySelector('.lower-text');
+        let removeClasses = () => {
+          [...topText.querySelectorAll('span')].map(el => {
+            el.classList.remove('latest-syllable');
           })
+        };
+
+        let textAnimations = after(moveToTunnel,
+          state.activeStory.transitions.map(([first, second], i) => {
+            let baseTime = (i + 1) * 1200;
+            let target = topText;
+            return [
+              [baseTime, () => {
+                removeClasses();
+                target.appendChild(
+                  domElements.span({classList: ["latest-syllable"]},
+                    [document.createTextNode(first)]
+                  )
+                );
+              }],
+              [baseTime + 400, () => {
+                removeClasses();
+                target.appendChild(
+                  domElements.span({classList: ["latest-syllable"]},
+                    [document.createTextNode(second + " ")]
+                  )
+                );
+                if (((i + 1) % 2) === 0) {
+                  target.appendChild(domElements.br({}));
+                }
+              }]
+            ]
+          }).flat()
         );
+        after(textAnimations, [[400, removeClasses]]);
 
         after(characterExitsTunnel, [
           [1000, () => narrationText(state.activeStory.finalText)],

@@ -76,7 +76,7 @@ button {
   border: 1px solid var(--sea-blue);
   font-size: 20px;
   margin: 5px;
-  transition: background-color,width,margin,font-size .3s ease-in;
+  transition: background-color, width, margin, font-size .3s ease-in;
   cursor: pointer;
 }
 
@@ -187,11 +187,12 @@ button:hover {
   position: absolute;
   width: 100%;
   height: 150px;
-  font-size: 32px;
+  font-size: 26px;
   font-family: 'Andale Mono', 'Monaco', 'sans-serif';
-  color: var(--sea-blue);
+  color: var(--dark-neutral);
   line-height: 1.4em;
   padding: 5px;
+  transition: font-size, color, font-weight .4s;
 }
 
 .top-text {
@@ -202,6 +203,8 @@ button:hover {
   top: 430px;
 }
 
-.top-text span:last-of-type .lower-text span:last-of-type {
+.latest-syllable {
   font-weight: 900;
+  color: var(--sea-blue);
+  font-size: 32px;
 }
