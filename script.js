@@ -1,6 +1,11 @@
 const init = (rootNode) => {
   let vh = window.innerHeight * 0.01;
   document.documentElement.style.setProperty('--vh', `${vh}px`);
+  window.onerror = (message, source, lineno, colno, error) => {
+    console.log("unexpected error");
+    console.log(message, source, lineno, colno, error);
+    rootNode.appendChild(document.createTextNode(`${message} ${source} ${lineno} ${colno} ${error}`));
+  };
 
   const items = (() => {
     const randomGender = () => {
