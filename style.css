@@ -175,6 +175,9 @@ button:hover {
 
 .tunnel {
   transition: fill .5s ease-in;
+  filter: opacity(90%);
+  backdrop-filter: contrast(0%);
+  --webkit-backdrop-filter: contrast(0%);
 }
 
 .lighting-effect {

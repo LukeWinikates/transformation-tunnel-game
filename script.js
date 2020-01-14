@@ -692,6 +692,12 @@ const init = (rootNode) => {
       }
       characterNode.setAttribute('x', character.x);
       characterNode.setAttribute('y', character.y);
+      if (positions.tunnelEntrance.x < character.x
+        && character.x < positions.endOfTunnel.x) {
+        characterNode.style.filter = 'contrast(0%) blur(2px)';
+      } else {
+        characterNode.style.filter = '';
+      }
     };
 
     const updateNarrationButton = visible => {
