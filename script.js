@@ -364,13 +364,41 @@ const init = (rootNode) => {
 
       let characterSpeed = 10; // 10px per s
 
+      startProgressBar = (allDoneAt, f) => {
+        let startTime = (new Date()).valueOf();
+        let endTime = (new Date().valueOf()) + allDoneAt;
+
+        let tick = () => {
+          let current = new Date().valueOf();
+          if (current <= endTime) {
+            const milisElapsed = current - startTime;
+            const expectedMillis = endTime - startTime;
+            let pct = milisElapsed / expectedMillis;
+            f(Math.round(pct * 100));
+            setTimeout(tick, 10);
+          } else {
+            f(100);
+          }
+        };
+
+        return {
+          tick
+        }
+      };
+
       let step1 = () => {
         hideNarrationButton();
         let showNarration = effects([
           [0, () => narrationText(state.activeStory.introText)],
         ]);
         centerViewBoxOn(positions.characterPauseLocation);
-        after(showNarration + 1500, moveTo(moveCharacter, positions.characterEntryPoint, positions.characterPauseLocation, characterSpeed), showNarrationButton);
+        let allDoneAt = after(showNarration + 1500, moveTo(moveCharacter, positions.characterEntryPoint, positions.characterPauseLocation, characterSpeed), showNarrationButton);
+        startProgressBar(allDoneAt, (pct) => {
+          state.stepCompletionPct = pct;
+          console.log(pct);
+        }).tick();
+        // tick until we're all done'
+        // setInterval()
         state.nextStep = step2;
       };
 
@@ -378,11 +406,16 @@ const init = (rootNode) => {
 
       let step2 = () => {
         hideNarrationButton();
-        after(0, [
+        let allDoneAt = after(0, [
           [0, fadeNarration],
           [1000, () => narrationText(state.activeStory.postIntroText)],
           [1500, () => swirlEmojiAroundCharacter(state.activeStory.initialThoughtEmoji)]
         ], showNarrationButton);
+
+        startProgressBar(allDoneAt, (pct) => {
+          state.stepCompletionPct = pct
+        }).tick();
+
         state.nextStep = step3;
       };
 
@@ -445,12 +478,15 @@ const init = (rootNode) => {
         );
         after(textAnimations, [[400, () => removeClasses(800)]]);
 
-        after(characterExitsTunnel, [
+        let allDoneAt = after(characterExitsTunnel, [
           [1000, () => narrationText(state.activeStory.finalText)],
           [1000, () => swirlEmojiAroundCharacter(state.activeStory.finalThoughtEmoji)],
           [5000, () => {
           }]
         ], showNarrationButton);
+        startProgressBar(allDoneAt, (pct) => {
+          state.stepCompletionPct = pct
+        }).tick();
         state.nextStep = scrollViewBoxBack;
       };
 
@@ -462,7 +498,11 @@ const init = (rootNode) => {
     function Narration() {
       return domElements.div({id: 'narration', classList: ['fade']}, [
         domElements.span({id: 'narration-text'}),
-        Button('next...', () => {
+        Button(`next... ${state.stepCompletionPct ? state.stepCompletionPct : ''}`, () => {
+          state = {
+            ...state,
+            stepCompletionPct: null
+          };
           state.nextStep();
         }, {classList: ['narration-button']})
       ]);
@@ -586,23 +626,33 @@ const init = (rootNode) => {
         })
       ]);
     };
-
+    const ProgressBar = () => {
+      return domElements.div({classList: ['progress-bar']})
+    };
     return () => {
       return [
         Narration(),
         World(),
         LowerText(),
+        ProgressBar(),
         Title({visible: state.titleScreenVisible}),
         ButtonPanel({visible: state.panelVisible})
       ];
     };
   })();
 
+  window.handles = [];
+
+  const enqueueEffect = (f, timing) => {
+    let handle = setTimeout(f, timing);
+    handles.push(handle);
+  };
+
   const effects = (effectsList, done = () => {
   }) => {
     let last = effectsList.reverse()[0];
     return [...effectsList, [last[0], done]].map(([timing, f]) => {
-      setTimeout(f, timing);
+      enqueueEffect(f, timing);
       return {
         time: timing,
       }
@@ -649,6 +699,10 @@ const init = (rootNode) => {
       button.classList[visible ? 'add' : 'remove']('visible');
     };
 
+    const updateProgressBar = pct => {
+      state.nodes.root.querySelector('.progress-bar').innerText = pct;
+    };
+
     const updateViewBox = viewBox => {
       let svg = state.nodes.root.querySelector('svg');
       if (viewBox.join(' ') === svg.getAttribute('viewBox')) {
@@ -664,6 +718,7 @@ const init = (rootNode) => {
       updateTitleScreen(state.titleScreenVisible);
       updateViewBox(state.viewBox);
       updateNarrationButton(state.narrationButtonVisible);
+      updateProgressBar(state.stepCompletionPct);
       state.character && updateCharacter(state.character);
       state.terminated || requestAnimationFrame(animate);
     };
