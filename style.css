@@ -118,6 +118,7 @@ button:hover {
   margin: 15%;
   bottom: 0;
   transition: .5s bottom;
+  background-color: var(--tinge-neutral);
 }
 
 .title-panel.hidden {
@@ -142,25 +143,25 @@ button:hover {
   border: 1px solid var(--dark-neutral);
 }
 
-.narration-button {
+.progress-button {
   opacity: 0;
   background-color: var(--tinge-neutral);
   text-decoration: dotted;
-  width: 50%;
+  width: 100%;
   padding: 10px;
-  margin-left: 0;
-  margin-right: 0;
-  border-radius: 0;
+  margin: 0;
+
+  /*border-radius: 0;*/
   transition: background-color .3s ease-out, opacity .3s ease-out;
-  box-shadow: 2px 1px 2px var(--dark-neutral);
-  border: 1px solid var(--dark-neutral);
+  /*box-shadow: 2px 1px 2px var(--dark-neutral);*/
+  /*border: 1px solid var(--dark-neutral);*/
 }
 
-.narration-button.visible {
+.progress-button.visible {
   opacity: 1;
 }
 
-.narration-button:hover {
+.progress-button:hover {
   background-color: var(--yellow);
 }
 
@@ -185,20 +186,20 @@ button:hover {
   opacity: .3;
 }
 
-.character-word-effect {
+.lower-section {
   position: absolute;
   width: 100%;
-  height: 150px;
+  /*height: 150px;*/
+  bottom: 0;
+}
+
+.character-word-effect {
   font-size: 26px;
   font-family: 'Andale Mono', 'Monaco', 'sans-serif';
   color: var(--dark-neutral);
   line-height: 1.4em;
   padding: 5px;
   transition: font-size, color, font-weight .4s;
-}
-
-.character-word-effect {
-  top: 430px;
 }
 
 .latest-syllable {
@@ -213,7 +214,11 @@ button:hover {
 }
 
 .progress-bar {
-  position: absolute;
-  bottom: 0;
   width: 100%;
+}
+
+.indicator {
+  width: 0;
+  height: 5px;
+  background-color: var(--sea-blue);
 }

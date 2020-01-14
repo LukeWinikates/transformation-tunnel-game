@@ -1,11 +1,13 @@
 const init = (rootNode) => {
   let vh = window.innerHeight * 0.01;
   document.documentElement.style.setProperty('--vh', `${vh}px`);
-  window.onerror = (message, source, lineno, colno, error) => {
-    console.log("unexpected error");
-    console.log(message, source, lineno, colno, error);
-    rootNode.appendChild(document.createTextNode(`${message} ${source} ${lineno} ${colno} ${error}`));
-  };
+  if (window.location.host.match(/(127\.0\.0\.1)|(tesselgram-test)/)) {
+    window.onerror = (message, source, lineno, colno, error) => {
+      console.log("unexpected error");
+      console.log(message, source, lineno, colno, error);
+      rootNode.appendChild(document.createTextNode(`${message} ${source} ${lineno} ${colno} ${error}`));
+    };
+  }
 
   const items = (() => {
     const randomGender = () => {
@@ -342,7 +344,7 @@ const init = (rootNode) => {
       };
 
       if (+x > 80) {
-        scrollViewBoxBack();
+        setTimeout(scrollViewBoxBack, 10);
       } else {
         reinitialize();
       }
@@ -488,6 +490,7 @@ const init = (rootNode) => {
           state.stepCompletionPct = pct
         }).tick();
         state.nextStep = scrollViewBoxBack;
+        state.nextStep.title = "return";
       };
 
       step1();
@@ -497,18 +500,11 @@ const init = (rootNode) => {
   const render = (() => {
     function Narration() {
       return domElements.div({id: 'narration', classList: ['fade']}, [
-        domElements.span({id: 'narration-text'}),
-        Button(`next... ${state.stepCompletionPct ? state.stepCompletionPct : ''}`, () => {
-          state = {
-            ...state,
-            stepCompletionPct: null
-          };
-          state.nextStep();
-        }, {classList: ['narration-button']})
+        domElements.span({id: 'narration-text'})
       ]);
     }
 
-    function LowerText() {
+    function CharacterWordEffect() {
       return domElements.div({classList: ['character-word-effect']});
     }
 
@@ -619,22 +615,34 @@ const init = (rootNode) => {
       return a.join(' ');
     };
 
-    const ReturnPrompt = () => {
-      return domElements.div({classList: ['title-panel']}, [
-        Button('Return', () => {
-          scrollViewBoxBack();
-        })
+    const LowerSection = () => {
+      return domElements.div({classList: ['lower-section']}, [
+        CharacterWordEffect(),
+        ProgressBar(),
+        ProgressButton(),
       ]);
     };
+
     const ProgressBar = () => {
-      return domElements.div({classList: ['progress-bar']})
+      return domElements.div({classList: ['progress-bar']}, [
+        domElements.div({classList: ['indicator']})
+      ])
+    };
+
+    const ProgressButton = () => {
+      return Button(state.nextStep.title || "next...", () => {
+        state = {
+          ...state,
+          stepCompletionPct: null
+        };
+        state.nextStep();
+      }, {classList: ['progress-button']})
     };
     return () => {
       return [
         Narration(),
         World(),
-        LowerText(),
-        ProgressBar(),
+        LowerSection(),
         Title({visible: state.titleScreenVisible}),
         ButtonPanel({visible: state.panelVisible})
       ];
@@ -700,13 +708,14 @@ const init = (rootNode) => {
       }
     };
 
-    const updateNarrationButton = visible => {
-      const button = state.nodes.root.querySelector('.narration-button');
+    const updateProgressButton = visible => {
+      const button = state.nodes.root.querySelector('.progress-button');
       button.classList[visible ? 'add' : 'remove']('visible');
     };
 
     const updateProgressBar = pct => {
-      state.nodes.root.querySelector('.progress-bar').innerText = pct;
+      let indicator = state.nodes.root.querySelector('.progress-bar .indicator');
+      indicator.style.width = `${pct}%`;
     };
 
     const updateViewBox = viewBox => {
@@ -723,7 +732,7 @@ const init = (rootNode) => {
       updateButtonPanel(state.panelVisible);
       updateTitleScreen(state.titleScreenVisible);
       updateViewBox(state.viewBox);
-      updateNarrationButton(state.narrationButtonVisible);
+      updateProgressButton(state.stepCompletionPct === 100);
       updateProgressBar(state.stepCompletionPct);
       state.character && updateCharacter(state.character);
       state.terminated || requestAnimationFrame(animate);
