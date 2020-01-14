@@ -62,7 +62,7 @@ const init = (rootNode) => {
         characterEmoji: randomGender() + randomSkinTone() + '‍💼',
         initialThoughtEmoji: ['💄', '📊'],
         finalThoughtEmoji: ['🌘', '🖤'],
-        transitions: [['lip', 'stick'], ['lip', 'stick'], ['lip', 'stick'], ['lip', 'sed...?'], ['ec', 'lipsed'], ['ec', 'lipsed'], ['ec', 'lipsed!']],
+        transitions: [['lip', 'stick'], ['lip', 'stick'], ['lip', 'stick'], ['lips...', ''], ['ec', 'lipsed!'], ['ec', 'lipsed!'], ['ec', 'lipsed!']],
         finalText: '"The matte black is just like when the moon is fully ECLIPSED!"'
       }
     ]
@@ -379,42 +379,52 @@ const init = (rootNode) => {
           strobeTunnel();
         }]]);
 
-        const topText = state.nodes.root.querySelector('.top-text');
-        // const lowerText = state.nodes.root.querySelector('.lower-text');
-        let removeClasses = () => {
-          [...topText.querySelectorAll('span')].map(el => {
+        const lowerText = state.nodes.root.querySelector('.character-word-effect');
+        let removeClasses = (upTo) => {
+          [...lowerText.querySelectorAll('span')].slice(0, upTo + 1).map(el => {
             el.classList.remove('latest-syllable');
-          })
+            el.classList.remove('invisible-syllable');
+          });
         };
 
+        state.activeStory.transitions.map(([first, second], i) => {
+          let target = lowerText;
+          // removeClasses();
+          target.appendChild(
+            domElements.span({classList: ["invisible-syllable"]},
+              [document.createTextNode(first)]
+            )
+          );
+          target.appendChild(
+            domElements.span({classList: ["invisible-syllable"]},
+              [document.createTextNode(second + " ")]
+            )
+          );
+          if (((i + 1) % 2) === 0) {
+            target.appendChild(domElements.br({}));
+          }
+        });
+
         let textAnimations = after(moveToTunnel,
-          state.activeStory.transitions.map(([first, second], i) => {
-            let baseTime = (i + 1) * 1200;
-            let target = topText;
+          state.activeStory.transitions.map((_, i) => {
+            let baseTime = (i + 1) * 800;
+            let target = lowerText;
             return [
               [baseTime, () => {
-                removeClasses();
-                target.appendChild(
-                  domElements.span({classList: ["latest-syllable"]},
-                    [document.createTextNode(first)]
-                  )
-                );
+                removeClasses(2 * i);
+                const element = [...target.querySelectorAll('span')][2 * i];
+                console.log(element);
+                console.log(element.innerText);
+                element.classList.add("latest-syllable");
               }],
-              [baseTime + 400, () => {
-                removeClasses();
-                target.appendChild(
-                  domElements.span({classList: ["latest-syllable"]},
-                    [document.createTextNode(second + " ")]
-                  )
-                );
-                if (((i + 1) % 2) === 0) {
-                  target.appendChild(domElements.br({}));
-                }
+              [baseTime + 300, () => {
+                removeClasses((2 * i) + 1);
+                [...target.querySelectorAll('span')][(2 * i) + 1].classList.add("latest-syllable");
               }]
             ]
           }).flat()
         );
-        after(textAnimations, [[400, removeClasses]]);
+        after(textAnimations, [[400, () => removeClasses(800)]]);
 
         after(characterExitsTunnel, [
           [1000, () => narrationText(state.activeStory.finalText)],
@@ -439,12 +449,8 @@ const init = (rootNode) => {
       ]);
     }
 
-    function TopText() {
-      return domElements.div({classList: ['top-text']});
-    }
-
     function LowerText() {
-      return domElements.div({classList: ['lower-text']});
+      return domElements.div({classList: ['character-word-effect']});
     }
 
     const ItemButton = (item) => {
@@ -547,7 +553,7 @@ const init = (rootNode) => {
           width: 2000,
           fill: 'transparent'
         }),
-      ].filter(i => !!i));
+      ]);
     };
 
     const viewBoxAttribute = (a) => {
@@ -565,7 +571,6 @@ const init = (rootNode) => {
     return () => {
       return [
         Narration(),
-        TopText(),
         World(),
         LowerText(),
         Title({visible: state.titleScreenVisible}),

@@ -9,21 +9,22 @@
 [X] show the character emerging from the tunnel
 [X] better framing/making better use of the screen space
 [X] more interesting display of the "transition words"
-[ ] translucency effect on tunnel
-    * https://developer.mozilla.org/ja/docs/Web/CSS/filter
-[ ] animate the transition words, do fade-out effect like:
+[X] animate the transition words, do fade-out effect like:
     * https://codepen.io/LukeWinikates/pen/mdyrvLz
     * Use the same font “Tesselgram” shows up in. Use a mix of uppercase and spreading space.
     * Fade out older words as newer words fade in to make it more readable.
     * Fade them to a light but still visible gray.
-    * Use font size and capitalization to call out the changes in
-    * emphasis/syllable stress, or just where the change is and their attention needs to be.
+    * Use font size ~~and capitalization~~ to call out the changes in emphasis/syllable stress, or just where the change is and their attention needs to be.
+[ ] translucency effect on tunnel
+    * https://developer.mozilla.org/ja/docs/Web/CSS/filter
 [ ] fix up the thought-bubble-emoji again. "Splitting up the thought emoji isn’t as good as id hoped. The ninja one no longer scans visually."
 [ ] Calculate the width of the SVG element. Use that to set the viewport? On the basis of that, “center” the character’s exit point on the camera by setting the left edge to the destination point minus 50% of the width.
 [ ] harmonize the spacing again
+    * use math to figure out the screen-center position
 [ ] make the show-the-button timings feel more right
 [ ] Make them say something when they go into the tunnel
 [ ] Figure out the weird motion that happens on the mobile version (iOS at least...)
+[ ] what if instead of panning (which doesn't look like anything), we zoom out, then back in as they exit the tunnel?
 [ ] disable double-clicks
 ---------------
 [ ] do favicon, etc
