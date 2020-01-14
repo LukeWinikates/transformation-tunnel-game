@@ -18,7 +18,8 @@
 [ ] translucency effect on tunnel
     * https://developer.mozilla.org/ja/docs/Web/CSS/filter
 [ ] fix up the thought-bubble-emoji again. "Splitting up the thought emoji isn’t as good as id hoped. The ninja one no longer scans visually."
-[ ] Calculate the width of the SVG element. Use that to set the viewport? On the basis of that, “center” the character’s exit point on the camera by setting the left edge to the destination point minus 50% of the width.
+[X] Calculate the width of the SVG element. Use that to set the viewport? On the basis of that, “center” the character’s exit point on the camera by setting the left edge to the destination point minus 50% of the width.
+[ ] fix the "jump" that happens when the tunnel pans to the character position for the first time
 [ ] harmonize the spacing again
     * use math to figure out the screen-center position
 [ ] make the show-the-button timings feel more right

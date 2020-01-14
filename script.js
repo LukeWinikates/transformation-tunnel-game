@@ -205,6 +205,17 @@ const init = (rootNode) => {
       }));
     };
 
+    const centerViewBoxOn = ({x}) => {
+      let [_, y, w, h] = state.viewBox;
+      const HARDCODED_CHARACTER_WIDTH = 36;
+      let newX = (x + (HARDCODED_CHARACTER_WIDTH / 2)) - (w / 2);
+      let newViewBox = [newX + 1, y, w, h];
+      state = {
+        ...state,
+        viewBox: newViewBox
+      };
+    };
+
     const flashLighting = color => {
       const lighting = document.querySelector('.lighting-effect');
       lighting.setAttribute('fill', color);
@@ -337,6 +348,12 @@ const init = (rootNode) => {
       }
     };
 
+    const moveCharacterAndFollowWithCamera = (position) => {
+      moveCharacter(position);
+      centerViewBoxOn(position);
+    };
+
+
     return () => {
       state = {
         ...state,
@@ -352,6 +369,7 @@ const init = (rootNode) => {
         let showNarration = effects([
           [0, () => narrationText(state.activeStory.introText)],
         ]);
+        centerViewBoxOn(positions.characterPauseLocation);
         after(showNarration + 1500, moveTo(moveCharacter, positions.characterEntryPoint, positions.characterPauseLocation, characterSpeed), showNarrationButton);
         state.nextStep = step2;
       };
@@ -371,11 +389,12 @@ const init = (rootNode) => {
       let step3 = () => {
         hideNarrationButton();
         fadeNarration();
+
         let moveToTunnel = after(1500, moveTo(moveCharacter, positions.characterPauseLocation, positions.tunnelEntrance, characterSpeed));
-        let characterExitsTunnel = after(moveToTunnel, moveTo(moveCharacter, positions.tunnelEntrance, positions.tunnelExitPauseLocation, characterSpeed));
+        let characterExitsTunnel = after(moveToTunnel, moveTo(moveCharacterAndFollowWithCamera, positions.tunnelEntrance, positions.tunnelExitPauseLocation, characterSpeed));
 
         after(moveToTunnel - 500, [[0, () => {
-          panViewBox();
+          // panViewBox();
           strobeTunnel();
         }]]);
 
