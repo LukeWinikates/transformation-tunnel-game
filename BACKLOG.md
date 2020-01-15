@@ -17,11 +17,11 @@
     * Use font size ~~and capitalization~~ to call out the changes in emphasis/syllable stress, or just where the change is and their attention needs to be.
 [X] Calculate the width of the SVG element. Use that to set the viewport? On the basis of that, “center” the character’s exit point on the camera by setting the left edge to the destination point minus 50% of the width.
 [?] Figure out the weird motion that happens on the mobile version (iOS at least...)
-[ ] translucency effect on tunnel
+[X] translucency effect on tunnel
     * https://developer.mozilla.org/ja/docs/Web/CSS/filter
-[ ] dope-looking progress bar
+[X] dope-looking progress bar
+[X] move the button back to the bottom
 [ ] something that shows up in the top-right corner? ☀️
-[ ] move the button back to the buttom
 [ ] fix up the thought-bubble-emoji again. "Splitting up the thought emoji isn’t as good as id hoped. The ninja one no longer scans visually."
 [ ] fix the "jump" that happens when the tunnel pans to the character position for the first time
 [ ] harmonize the spacing again

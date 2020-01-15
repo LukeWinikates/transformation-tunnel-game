@@ -191,30 +191,17 @@ const init = (rootNode) => {
   };
 
   const startScene = (() => {
-    const panViewBox = () => {
-      effects(repeat(900).map(i => {
-        return [
-          (i + 1) * 7,
-          () => {
-            [x, y, w, h] = state.viewBox;
-            let newViewBox = [x + 1, y, w, h];
-            state = {
-              ...state,
-              viewBox: newViewBox
-            };
-          }
-        ]
-      }));
-    };
-
-    const centerViewBoxOn = ({x}) => {
+    const findNewViewBoxCenter = ({x}) => {
       let [_, y, w, h] = state.viewBox;
       const HARDCODED_CHARACTER_WIDTH = 36;
       let newX = (x + (HARDCODED_CHARACTER_WIDTH / 2)) - (w / 2);
-      let newViewBox = [newX + 1, y, w, h];
+      return [newX + 1, y, w, h];
+    };
+
+    const centerViewBoxOn = ({x}) => {
       state = {
         ...state,
-        viewBox: newViewBox
+        viewBox: findNewViewBoxCenter({x})
       };
     };
 
@@ -343,7 +330,7 @@ const init = (rootNode) => {
         viewBox: [x - 2, y, w, h]
       };
 
-      if (+x > 80) {
+      if (x >= findNewViewBoxCenter(positions.characterPauseLocation)[0]) {
         setTimeout(scrollViewBoxBack, 10);
       } else {
         reinitialize();
@@ -366,7 +353,7 @@ const init = (rootNode) => {
 
       let characterSpeed = 10; // 10px per s
 
-      startProgressBar = (allDoneAt, f) => {
+      const startProgressBar = (allDoneAt, f) => {
         let startTime = (new Date()).valueOf();
         let endTime = (new Date().valueOf()) + allDoneAt;
 
@@ -397,14 +384,9 @@ const init = (rootNode) => {
         let allDoneAt = after(showNarration + 1500, moveTo(moveCharacter, positions.characterEntryPoint, positions.characterPauseLocation, characterSpeed), showNarrationButton);
         startProgressBar(allDoneAt, (pct) => {
           state.stepCompletionPct = pct;
-          console.log(pct);
         }).tick();
-        // tick until we're all done'
-        // setInterval()
         state.nextStep = step2;
       };
-
-      // step 1
 
       let step2 = () => {
         hideNarrationButton();
@@ -429,7 +411,6 @@ const init = (rootNode) => {
         let characterExitsTunnel = after(moveToTunnel, moveTo(moveCharacterAndFollowWithCamera, positions.tunnelEntrance, positions.tunnelExitPauseLocation, characterSpeed));
 
         after(moveToTunnel - 500, [[0, () => {
-          // panViewBox();
           strobeTunnel();
         }]]);
 
@@ -467,8 +448,6 @@ const init = (rootNode) => {
               [baseTime, () => {
                 removeClasses(2 * i);
                 const element = [...target.querySelectorAll('span')][2 * i];
-                console.log(element);
-                console.log(element.innerText);
                 element.classList.add("latest-syllable");
               }],
               [baseTime + 300, () => {
